@@ -3,22 +3,30 @@ module Arel
     class PostgreSQL
       private
       
+      def column_for attr
+        return nil if attr.is_a?(Arel::Attributes::Key)
+        super
+      end
+      
       def visit_Arel_Nodes_Contains o, collector
         visit o.left, collector
         collector << ' @> '
         collector << quote(o.left.type_cast_for_database(o.right))
+        collector
       end
       
       def visit_Arel_Nodes_ContainedBy o, collector
         visit o.left, collector
         collector << ' <@ '
         collector << quote(o.left.type_cast_for_database(o.right))
+        collector
       end
 
       def visit_Arel_Nodes_Overlaps o, collector
         visit o.left, collector
         collector << ' && '
         collector << quote(o.left.type_cast_for_database(o.right))
+        collector
       end
       
       def visit_Arel_Attributes_Key(o, collector, last_key = true)
@@ -34,12 +42,20 @@ module Arel
         else
           visit(o.relation, collector)
           collector << "\#>>'{" << o.name.to_s
-          if !last_key
-            collector << "."
-          end
+          collector << (last_key ? "}'" : ".")
         end
+        collector
       end
-      
+
+      def visit_Arel_Nodes_HasKey(o, collector)
+        right = o.right
+        
+        collector = visit o.left, collector
+        
+        collector << " ? " << quote(right.to_s)
+        collector
+      end
+
     end
   end
 end
