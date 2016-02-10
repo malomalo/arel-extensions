@@ -5,6 +5,7 @@ Arel::Attributes::Attribute.include(Arel::ArrayPredications)
 
 
 require File.expand_path('../attributes/key', __FILE__)
+require File.expand_path('../attributes/cast', __FILE__)
 require File.expand_path('../nodes/has_any_key', __FILE__)
 require File.expand_path('../nodes/has_key', __FILE__)
 require File.expand_path('../nodes/has_keys', __FILE__)

@@ -1,6 +1,6 @@
 module Arel
   module Attributes
-    class Key < Attribute
+    class Cast < Attribute
       
       def able_to_type_cast?
         false

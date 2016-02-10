@@ -19,5 +19,9 @@ module Arel
       Arel::Nodes::HasAnyKeys.new(self, keys)
     end
     
+    def as(type)
+      Arel::Attributes::Cast.new(self, type)
+    end
+    
   end
 end

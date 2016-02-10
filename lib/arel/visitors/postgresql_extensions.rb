@@ -55,6 +55,13 @@ module Arel
         collector << " ? " << quote(right.to_s)
         collector
       end
+      
+      def visit_Arel_Attributes_Cast(o, collector)
+        collector << "("
+        visit(o.relation, collector)
+        collector << ")::#{o.name}"
+        collector
+      end
 
     end
   end
