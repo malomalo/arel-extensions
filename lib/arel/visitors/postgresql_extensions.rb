@@ -62,6 +62,35 @@ module Arel
         collector << ")::#{o.name}"
         collector
       end
+      
+      def visit_Arel_Nodes_TSMatch(o, collector)
+        visit o.left, collector
+        collector << ' @@ '
+        visit o.right, collector
+        collector
+      end
+      
+      def visit_Arel_Nodes_TSVector(o, collector)
+        collector << 'to_tsvector('
+        if o.language
+          visit(o.language, collector) 
+          collector << ', '
+        end
+        visit(o.attribute, collector) 
+        collector << ')'
+        collector
+      end
+      
+      def visit_Arel_Nodes_TSQuery(o, collector)
+        collector << 'to_tsquery('
+        if o.language
+          visit(o.language, collector) 
+          collector << ', '
+        end
+        visit(o.expression, collector) 
+        collector << ')'
+        collector
+      end
 
     end
   end
