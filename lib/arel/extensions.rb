@@ -21,3 +21,7 @@ Arel::Attributes::Attribute.include(Arel::TSPredications)
 if defined?(Arel::Visitors::PostgreSQL)
   require File.expand_path('../visitors/postgresql_extensions', __FILE__)
 end
+
+if defined?(Arel::Visitors::Sunstone)
+  require File.expand_path('../visitors/sunstone_extensions', __FILE__)
+end
