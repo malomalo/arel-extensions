@@ -41,7 +41,7 @@ module Arel
           end
         else
           visit(o.relation, collector)
-          collector << "\#>>'{" << o.name.to_s
+          collector << "\#>'{" << o.name.to_s
           collector << (last_key ? "}'" : ",")
         end
         collector
