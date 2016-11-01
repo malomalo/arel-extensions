@@ -18,6 +18,8 @@ require File.expand_path('../nodes/ts_match', __FILE__)
 require File.expand_path('../ts_predications', __FILE__)
 Arel::Attributes::Attribute.include(Arel::TSPredications)
 
+require File.expand_path('../../active_record/query_methods', __FILE__)
+
 if defined?(Arel::Visitors::PostgreSQL)
   require File.expand_path('../visitors/postgresql_extensions', __FILE__)
 end
