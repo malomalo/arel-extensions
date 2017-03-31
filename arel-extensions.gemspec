@@ -1,6 +1,6 @@
 Gem::Specification.new do |gem|
   gem.name = 'arel-extensions'
-  gem.version = '1.1.0'
+  gem.version = '1.2.0'
   
   gem.authors       = ["Jon Bracy"]
   gem.email         = ["jonbracy@gmail.com"]
