@@ -1,5 +1,6 @@
 require File.expand_path('../nodes/overlaps', __FILE__)
 require File.expand_path('../nodes/contains', __FILE__)
+require File.expand_path('../nodes/contained_by', __FILE__)
 require File.expand_path('../array_predications', __FILE__)
 Arel::Attributes::Attribute.include(Arel::ArrayPredications)
 
