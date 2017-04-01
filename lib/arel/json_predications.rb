@@ -23,5 +23,15 @@ module Arel
       Arel::Attributes::Cast.new(self, type)
     end
     
+    def dig(*keys)
+      keys = keys[0] if keys.size == 1 && keys.first.is_a?(Array)
+      
+      if keys.empty?
+        self
+      else
+        keys.inject(self) { |node, key| Arel::Attributes::Key.new(node, key) }
+      end
+    end
+    
   end
 end
