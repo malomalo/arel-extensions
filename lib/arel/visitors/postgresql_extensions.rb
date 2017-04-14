@@ -22,6 +22,15 @@ module Arel
         collector
       end
 
+      def visit_Arel_Nodes_Excludes o, collector
+        collector << 'NOT ('
+        visit o.left, collector
+        collector << ' @> '
+        collector << quote(o.left.type_cast_for_database(o.right))
+        collector << ')'
+        collector
+      end
+
       def visit_Arel_Nodes_Overlaps o, collector
         visit o.left, collector
         collector << ' && '
