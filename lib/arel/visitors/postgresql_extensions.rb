@@ -103,7 +103,7 @@ module Arel
 
       def visit_Arel_Nodes_Within o, collector
         node = if o.right.is_a?(Array)
-          make_envelope_args = [w, s, e, n, 4326].map { |x| Arel::Nodes.build_quoted(x) }
+          make_envelope_args = (o.right + [4326]).flatten.map { |x| Arel::Nodes.build_quoted(x) }
           envelope = Arel::Nodes::NamedFunction.new('ST_MakeEnvelope', make_envelope_args)
           Arel::Nodes::NamedFunction.new('ST_Within', [o.left, envelope])
         else
