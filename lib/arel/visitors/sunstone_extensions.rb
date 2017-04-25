@@ -14,6 +14,17 @@ module Arel
         end
       end
 
+      def visit_Arel_Nodes_Within o, collector
+        key = visit(o.left, collector)
+        value = { within:  o.right }
+
+        if key.is_a?(Hash)
+          add_to_bottom_of_hash(key, value)
+        else
+          { key => value }
+        end
+      end
+
       def visit_Arel_Nodes_Excludes o, collector
         key = visit(o.left, collector)
         value = { excludes: o.left.type_cast_for_database(o.right) }
