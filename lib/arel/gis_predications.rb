@@ -12,8 +12,8 @@ module Arel
         elsif (n.keys - [:north, :east, :south, :west]).empty?
           within(n[:north], n[:east], n[:south], n[:west])
         else
-          radius = n[:radius] * 1609.34
-          point_args = [point[:longitude], point[:latitude], radius].map { |x| Arel::Nodes.build_quoted(x) }
+          radius = Arel::Nodes.build_quoted(n[:radius] * 1609.34)
+          point_args = [n[:longitude], n[:latitude]].map { |x| Arel::Nodes.build_quoted(x) }
           point = Arel::Nodes::NamedFunction.new('ST_MakePoint', point_args).cast_as('geography')
           Arel::Nodes::NamedFunction.new('ST_DWithin', [self, point, radius])
         end
