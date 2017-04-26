@@ -1,0 +1,39 @@
+language: ruby
+sudo: false
+
+cache:
+  bundler: true
+
+rvm:
+  - 2.3.4
+  - 2.4.1
+
+env:
+  matrix:
+    - RAILS_VERSION=v5.1.0.rc2 GEM=ar:mysql2
+    - RAILS_VERSION=v5.1.0.rc2 GEM=ar:sqlite3
+    - RAILS_VERSION=v5.1.0.rc2 GEM=ar:postgresql
+
+addons:
+  postgresql: "9.4"
+
+before_install:
+  - unset BUNDLE_GEMFILE
+  - gem update --system
+  - gem update bundler
+
+install:
+  - git clone https://github.com/rails/rails.git ~/build/rails
+  - pushd ~/build/rails
+  - git checkout $RAILS_VERSION
+  - sed -i "s/Gem.ruby, '-w'/Gem.ruby, '-w0'/" ~/build/rails/activerecord/Rakefile
+  - sed -i "s/t.warning = true/t.warning = false/g" ~/build/rails/activerecord/Rakefile
+  - sed -i "/require 'support\/connection'/a \$LOAD_PATH.unshift\(File.expand_path\('~\/build\/malomalo\/arel-extensions\/lib'\)\)\nrequire 'arel/extensions'" ~/build/rails/activerecord/test/cases/helper.rb
+  - cat ~/build/rails/Gemfile
+  - "sed -i \"/group :db do/a gem 'arel-extensions', require: 'arel/extensions', path: File.expand_path\\('~\\/build\\/malomalo\\/arel-extensions'\\)\" ~/build/rails/Gemfile"
+  - cat ~/build/rails/Gemfile
+  - bundle install --jobs=3 --retry=3
+  - popd
+
+script:
+  - cd ~/build/rails && ci/travis.rb
