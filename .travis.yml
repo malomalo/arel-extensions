@@ -32,8 +32,8 @@ install:
   - sed -i "s/Gem.ruby, '-w'/Gem.ruby, '-w0'/" ~/build/rails/activerecord/Rakefile
   - sed -i "s/t.warning = true/t.warning = false/g" ~/build/rails/activerecord/Rakefile
   - sed -i "/require 'support\/connection'/a \$LOAD_PATH.unshift\(File.expand_path\('~\/build\/malomalo\/arel-extensions\/lib'\)\)\nrequire 'arel/extensions'" ~/build/rails/activerecord/test/cases/helper.rb
-  - cat ~/build/rails/Gemfile
   - "sed -i \"/group :db do/a gem 'arel-extensions', require: 'arel/extensions', path: File.expand_path\\('~\\/build\\/malomalo\\/arel-extensions'\\)\" ~/build/rails/Gemfile"
+  - sed -i "/rb-inotify/d" ~/build/rails/Gemfile
   - cat ~/build/rails/Gemfile
   - bundle install --jobs=3 --retry=3
   - popd

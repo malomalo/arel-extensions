@@ -36,6 +36,15 @@ module Arel
         end
       end
       
+      def visit_Arel_Nodes_HasKey(o, collector)
+        right = o.right
+        
+        collector = visit o.left, collector
+        
+        collector << " ? " << quote(right.to_s)
+        collector
+      end
+      
     end
   end
 end
