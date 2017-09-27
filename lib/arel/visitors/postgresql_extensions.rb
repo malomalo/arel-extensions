@@ -100,20 +100,26 @@ module Arel
         collector << ')'
         collector
       end
+      
+      def visit_Arel_Nodes_HexEncodedBinary(o, collector)
+        collector << "E'\\\\x"
+        collector << o.expr
+        collector << "'"
+        collector
+      end
 
       def visit_Arel_Nodes_Within o, collector
-        node = if o.right.is_a?(Array)
-          make_envelope_args = (o.right.reverse + [4326]).flatten.map { |x| Arel::Nodes.build_quoted(x) }
-          envelope = Arel::Nodes::NamedFunction.new('ST_MakeEnvelope', make_envelope_args)
-          Arel::Nodes::NamedFunction.new('ST_Within', [o.left, envelope])
+        envelope = if o.right.is_a?(Arel::Nodes::HexEncodedBinary)
+          Arel::Nodes::NamedFunction.new('ST_GeomFromEWKB', [o.right])
+        elsif o.right.is_a?(Arel::Nodes::Quoted) && o.right.expr.is_a?(String)
+          Arel::Nodes::NamedFunction.new('ST_GeomFromEWKT', [o.right])
+        elsif o.right.is_a?(Arel::Nodes::Quoted) && o.right.expr.is_a?(Hash)
+          Arel::Nodes::NamedFunction.new('ST_GeomFromGeoJSON', [Arel::Nodes.build_quoted(o.right.expr.to_json)])
         else
-          radius = Arel::Nodes.build_quoted(o.right[:radius] * 1609.34)
-          point_args = [o.right[:longitude], o.right[:latitude]].map { |x| Arel::Nodes.build_quoted(x) }
-          point = Arel::Attributes::Cast.new(Arel::Nodes::NamedFunction.new('ST_MakePoint', point_args), 'geography')
-          Arel::Nodes::NamedFunction.new('ST_DWithin', [o.left, point, radius])
+          raise 'within error'
         end
 
-        visit(node, collector)
+        visit(Arel::Nodes::NamedFunction.new('ST_Within', [o.left, envelope]), collector)
         collector
       end
 

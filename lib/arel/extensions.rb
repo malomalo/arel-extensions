@@ -1,3 +1,5 @@
+require File.expand_path('../nodes/hex_encoded_binary', __FILE__)
+
 require File.expand_path('../nodes/overlaps', __FILE__)
 require File.expand_path('../nodes/contains', __FILE__)
 require File.expand_path('../nodes/within', __FILE__)

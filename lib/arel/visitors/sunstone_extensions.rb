@@ -5,7 +5,7 @@ module Arel
       
       def visit_Arel_Nodes_Contains o, collector
         key = visit(o.left, collector)
-        value = { contains:  visit(o.right, collector) }
+        value = { contains: visit(o.right, collector) }
         
         if key.is_a?(Hash)
           add_to_bottom_of_hash(key, value)
@@ -14,9 +14,13 @@ module Arel
         end
       end
 
+      def visit_Arel_Nodes_HexEncodedBinary(o, collector)
+        o.expr
+      end
+      
       def visit_Arel_Nodes_Within o, collector
         key = visit(o.left, collector)
-        value = { within:  o.right }
+        value = { within: visit(o.right, collector) }
 
         if key.is_a?(Hash)
           add_to_bottom_of_hash(key, value)
