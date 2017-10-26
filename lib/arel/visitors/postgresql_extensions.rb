@@ -70,7 +70,7 @@ module Arel
         
         collector = visit o.left, collector
         
-        collector << " ?& " << quote(right.to_s)
+        collector << " ?& array[" << Array(right).map { |v| quote(v.to_s) }.join(',') << "]"
         collector
       end
       
@@ -79,7 +79,7 @@ module Arel
         
         collector = visit o.left, collector
         
-        collector << " ?| " << quote(right.to_s)
+        collector << " ?| array[" << Array(right).map { |v| quote(v.to_s) }.join(',') << "]"
         collector
       end
       
