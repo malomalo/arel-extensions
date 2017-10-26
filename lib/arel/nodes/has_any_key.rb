@@ -1,6 +1,6 @@
 module Arel
   module Nodes
-    class HasAnyKeys < Binary
+    class HasAnyKey < Binary
       # ?|
     end
   end

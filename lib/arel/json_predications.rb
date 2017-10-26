@@ -16,7 +16,7 @@ module Arel
     end
     
     def has_any_key(*keys)
-      Arel::Nodes::HasAnyKeys.new(self, keys)
+      Arel::Nodes::HasAnyKey.new(self, keys)
     end
     
     def cast_as(type)
