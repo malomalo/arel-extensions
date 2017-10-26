@@ -40,13 +40,37 @@ module Arel
         end
       end
       
-      def visit_Arel_Nodes_HasKey(o, collector)
-        right = o.right
+      def visit_Arel_Nodes_HasKey o, collector
+        key = visit(o.left, collector)
+        value = {has_key: (o.right.nil? ? nil : o.right.to_s)}
         
-        collector = visit o.left, collector
+        if key.is_a?(Hash)
+          add_to_bottom_of_hash(key, value)
+        else
+          { key => value }
+        end
+      end
+      
+      def visit_Arel_Nodes_HasKeys o, collector
+        key = visit(o.left, collector)
+        value = {has_keys: Array(o.right).map(&:to_s)}
         
-        collector << " ? " << quote(right.to_s)
-        collector
+        if key.is_a?(Hash)
+          add_to_bottom_of_hash(key, value)
+        else
+          { key => value }
+        end
+      end
+      
+      def visit_Arel_Nodes_HasAnyKey o, collector
+        key = visit(o.left, collector)
+        value = {has_any_key: Array(o.right).map(&:to_s)}
+        
+        if key.is_a?(Hash)
+          add_to_bottom_of_hash(key, value)
+        else
+          { key => value }
+        end
       end
       
     end

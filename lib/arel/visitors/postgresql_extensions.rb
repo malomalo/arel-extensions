@@ -64,6 +64,24 @@ module Arel
         collector << " ? " << quote(right.to_s)
         collector
       end
+
+      def visit_Arel_Nodes_HasKeys(o, collector)
+        right = o.right
+        
+        collector = visit o.left, collector
+        
+        collector << " ?& " << quote(right.to_s)
+        collector
+      end
+      
+      def visit_Arel_Nodes_HasAnyKey(o, collector)
+        right = o.right
+        
+        collector = visit o.left, collector
+        
+        collector << " ?| " << quote(right.to_s)
+        collector
+      end
       
       def visit_Arel_Attributes_Cast(o, collector)
         collector << "("
