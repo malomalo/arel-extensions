@@ -1,6 +1,6 @@
 Gem::Specification.new do |gem|
   gem.name = 'arel-extensions'
-  gem.version = '1.5.2'
+  gem.version = '1.6.0'
   
   gem.authors       = ["Jon Bracy"]
   gem.email         = ["jonbracy@gmail.com"]
@@ -12,7 +12,7 @@ Gem::Specification.new do |gem|
   gem.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
   gem.require_paths = ["lib"]
 
-  gem.add_dependency 'arel', '>= 7.0.0'
+  gem.add_dependency 'arel', '>= 9.0.0'
 
   gem.add_development_dependency 'rake'
   gem.add_development_dependency 'minitest'
