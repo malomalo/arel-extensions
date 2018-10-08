@@ -5,17 +5,17 @@ cache:
   bundler: true
 
 rvm:
-  - 2.3.4
   - 2.4.1
+  - 2.5.1
 
 env:
   matrix:
-    - RAILS_VERSION=v5.1.0 GEM=ar:mysql2
-    - RAILS_VERSION=v5.1.0 GEM=ar:sqlite3
-    - RAILS_VERSION=v5.1.0 GEM=ar:postgresql
-    - RAILS_VERSION=v5.1.1 GEM=ar:mysql2
-    - RAILS_VERSION=v5.1.1 GEM=ar:sqlite3
-    - RAILS_VERSION=v5.1.1 GEM=ar:postgresql
+    - RAILS_VERSION=v5.2.0 GEM=ar:mysql2
+    - RAILS_VERSION=v5.2.0 GEM=ar:sqlite3
+    - RAILS_VERSION=v5.2.0 GEM=ar:postgresql
+    - RAILS_VERSION=v5.2.1 GEM=ar:mysql2
+    - RAILS_VERSION=v5.2.1 GEM=ar:sqlite3
+    - RAILS_VERSION=v5.2.1 GEM=ar:postgresql
 
 addons:
   postgresql: "9.4"
