@@ -20,6 +20,8 @@ Arel::Attributes::Attribute.include(Arel::JSONPredications)
 require File.expand_path('../nodes/ts_vector', __FILE__)
 require File.expand_path('../nodes/ts_query', __FILE__)
 require File.expand_path('../nodes/ts_match', __FILE__)
+require File.expand_path('../nodes/ts_rank', __FILE__)
+require File.expand_path('../nodes/ts_rank_cd', __FILE__)
 require File.expand_path('../ts_predications', __FILE__)
 Arel::Attributes::Attribute.include(Arel::TSPredications)
 

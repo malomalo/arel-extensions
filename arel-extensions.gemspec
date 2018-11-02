@@ -1,6 +1,6 @@
 Gem::Specification.new do |gem|
   gem.name = 'arel-extensions'
-  gem.version = '1.6.0'
+  gem.version = '1.7.0'
   
   gem.authors       = ["Jon Bracy"]
   gem.email         = ["jonbracy@gmail.com"]
@@ -14,6 +14,12 @@ Gem::Specification.new do |gem|
 
   gem.add_dependency 'arel', '>= 9.0.0'
 
-  gem.add_development_dependency 'rake'
+  gem.add_development_dependency "bundler"
+  gem.add_development_dependency "rake"
   gem.add_development_dependency 'minitest'
+  gem.add_development_dependency 'minitest-reporters'
+  gem.add_development_dependency 'pg'
+  gem.add_development_dependency 'rgeo'
+  gem.add_development_dependency 'activerecord'
+  
 end

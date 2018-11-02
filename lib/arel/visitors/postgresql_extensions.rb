@@ -119,6 +119,24 @@ module Arel
         collector
       end
       
+      def visit_Arel_Nodes_TSRank(o, collector)
+        collector << 'ts_rank('
+        visit(o.tsvector, collector) 
+        collector << ', '
+        visit(o.tsquery, collector)
+        collector << ')'
+        collector
+      end
+      
+      def visit_Arel_Nodes_TSRankCD(o, collector)
+        collector << 'ts_rank_cd('
+        visit(o.tsvector, collector) 
+        collector << ', '
+        visit(o.tsquery, collector)
+        collector << ')'
+        collector
+      end
+      
       def visit_Arel_Nodes_HexEncodedBinary(o, collector)
         collector << "E'\\\\x"
         collector << o.expr

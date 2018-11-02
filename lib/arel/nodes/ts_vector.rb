@@ -4,7 +4,7 @@ module Arel
       
       attr_reader :attribute, :language
       
-      def initialize(attribute, language)
+      def initialize(attribute, language: nil)
         @attribute = attribute
         @language = Arel::Nodes.build_quoted(language) if language
       end
