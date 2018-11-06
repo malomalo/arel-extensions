@@ -1,3 +1,4 @@
+require "arel"
 require File.expand_path('../nodes/hex_encoded_binary', __FILE__)
 
 require File.expand_path('../nodes/overlaps', __FILE__)

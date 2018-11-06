@@ -1,6 +1,6 @@
 module Arel
   module Nodes
-    class HexEncodedBinary < Unary
+    class HexEncodedBinary < Arel::Nodes::Unary
       
     end
   end
