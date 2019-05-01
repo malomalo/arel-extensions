@@ -1,24 +1,26 @@
+dist: xenial
 language: ruby
 sudo: false
 
 cache:
   bundler: true
+  directories:
+    - /home/travis/.rvm/gems
 
 rvm:
-  - 2.4.1
-  - 2.5.1
+  - 2.5
+  - 2.6
 
 env:
   matrix:
-    - RAILS_VERSION=v5.2.0 GEM=ar:mysql2
-    - RAILS_VERSION=v5.2.0 GEM=ar:sqlite3
-    - RAILS_VERSION=v5.2.0 GEM=ar:postgresql
-    - RAILS_VERSION=v5.2.1 GEM=ar:mysql2
-    - RAILS_VERSION=v5.2.1 GEM=ar:sqlite3
-    - RAILS_VERSION=v5.2.1 GEM=ar:postgresql
+    - RAILS_VERSION=v6.0.0.rc1 GEM=activerecord:mysql2
+    - RAILS_VERSION=v6.0.0.rc1 GEM=activerecord:sqlite3
+    - RAILS_VERSION=v6.0.0.rc1 GEM=activerecord:postgresql
 
+services:
+  - mysql
 addons:
-  postgresql: "9.4"
+  postgresql: "10"
 
 before_install:
   - unset BUNDLE_GEMFILE
