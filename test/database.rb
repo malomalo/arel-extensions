@@ -22,6 +22,7 @@ ActiveRecord::Migration.suppress_messages do
     create_table "properties", force: :cascade do |t|
       t.string   "name",                 limit: 255
       t.tsvector 'vector_col'
+      t.jsonb     'metadata'
     end
 
   end

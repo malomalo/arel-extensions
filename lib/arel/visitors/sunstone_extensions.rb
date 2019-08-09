@@ -2,7 +2,9 @@ module Arel
   module Visitors
     class Sunstone
       private
-      
+
+      alias :visit_Hash :literal
+
       def visit_Arel_Nodes_Contains o, collector
         key = visit(o.left, collector)
         value = { contains: visit(o.right, collector) }
@@ -88,7 +90,7 @@ module Arel
       
       def visit_Arel_Nodes_HasAnyKey o, collector
         key = visit(o.left, collector)
-        value = {has_any_key: Array(o.right).map(&:to_s)}
+        value = { has_any_key: Array(o.right).map(&:to_s) }
         
         if key.is_a?(Hash)
           add_to_bottom_of_hash(key, value)
