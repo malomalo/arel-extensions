@@ -3,7 +3,13 @@ module Arel
     class Sunstone
       private
 
-      alias :visit_Hash :literal
+      def visit_Hash o, collector
+        value = {}
+        o.each { |key, value|
+          value[visit(key, collector)] = visit(value, collector)
+        end
+        value
+      end
 
       def visit_Arel_Nodes_Contains o, collector
         key = visit(o.left, collector)
