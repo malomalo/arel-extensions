@@ -16,6 +16,9 @@ env:
     - RAILS_VERSION=v6.0.0.rc1 GEM=activerecord:mysql2
     - RAILS_VERSION=v6.0.0.rc1 GEM=activerecord:sqlite3
     - RAILS_VERSION=v6.0.0.rc1 GEM=activerecord:postgresql
+    - RAILS_VERSION=v6.0.0.rc2 GEM=activerecord:mysql2
+    - RAILS_VERSION=v6.0.0.rc2 GEM=activerecord:sqlite3
+    - RAILS_VERSION=v6.0.0.rc2 GEM=activerecord:postgresql
 
 services:
   - mysql
