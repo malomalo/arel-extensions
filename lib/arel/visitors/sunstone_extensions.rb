@@ -5,7 +5,7 @@ module Arel
 
       def visit_Hash o, collector
         value = {}
-        o.each { |key, value|
+        o.each do |key, value|
           value[visit(key, collector)] = visit(value, collector)
         end
         value
