@@ -26,6 +26,7 @@ require File.expand_path('../nodes/ts_rank_cd', __FILE__)
 require File.expand_path('../ts_predications', __FILE__)
 Arel::Attributes::Attribute.include(Arel::TSPredications)
 
+require File.expand_path('../nodes/relation', __FILE__)
 
 require File.expand_path('../gis_predications', __FILE__)
 Arel::Attributes::Attribute.include(Arel::GISPredications)
@@ -38,4 +39,8 @@ end
 
 if defined?(Arel::Visitors::Sunstone)
   require File.expand_path('../visitors/sunstone_extensions', __FILE__)
+end
+
+if defined?(Arel::Visitors::ToSql)
+  require File.expand_path('../visitors/to_sql_extensions', __FILE__)
 end
