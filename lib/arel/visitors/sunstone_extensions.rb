@@ -44,7 +44,9 @@ module Arel
         end
         rvalue
       end
+      
       alias :visit_String                :literal
+      
       def visit_Symbol o, collector
         o.to_s
       end
