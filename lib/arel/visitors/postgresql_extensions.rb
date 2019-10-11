@@ -8,6 +8,26 @@ module Arel
         super
       end
       
+      def visit_Arel_Nodes_Ascending o, collector
+        case o.nulls
+        when :nulls_first then visit(o.expr, collector) << ' ASC NULLS FIRST'
+        when :nulls_last  then visit(o.expr, collector) << ' ASC NULLS LAST'
+        else visit(o.expr, collector) << ' ASC'
+        end
+      end
+
+      def visit_Arel_Nodes_Descending o, collector
+        case o.nulls
+        when :nulls_first then visit(o.expr, collector) << ' DESC NULLS FIRST'
+        when :nulls_last  then visit(o.expr, collector) << ' DESC NULLS LAST'
+        else visit(o.expr, collector) << ' DESC'
+        end
+      end
+      
+      def visit_Arel_Nodes_RandomOrdering o, collector
+        collector << "RANDOM()"
+      end
+      
       def visit_Arel_Nodes_Contains o, collector
         visit o.left, collector
         collector << ' @> '

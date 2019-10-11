@@ -9,6 +9,11 @@ require File.expand_path('../nodes/contained_by', __FILE__)
 require File.expand_path('../array_predications', __FILE__)
 Arel::Attributes::Attribute.include(Arel::ArrayPredications)
 
+require File.expand_path('../nodes/random', __FILE__)
+require File.expand_path(File.join(__FILE__, '../../../ext/arel/nodes/ascending'))
+require File.expand_path(File.join(__FILE__, '../../../ext/arel/nodes/descending'))
+require File.expand_path(File.join(__FILE__, '../../../ext/arel/order_predications'))
+
 
 require File.expand_path('../attributes/key', __FILE__)
 require File.expand_path('../attributes/cast', __FILE__)

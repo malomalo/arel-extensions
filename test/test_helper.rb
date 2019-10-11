@@ -112,6 +112,9 @@ class ActiveSupport::TestCase
   end
   ActiveSupport::Notifications.subscribe('sql.active_record', SQLLogger.new)
 
+  def assert_sql(expected, query)
+    assert_equal expected.strip, query.to_sql.strip.gsub(/\s+/, ' ')
+  end
   # test/unit backwards compatibility methods
   alias :assert_raise :assert_raises
   alias :assert_not_empty :refute_empty

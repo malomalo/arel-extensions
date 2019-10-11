@@ -3,6 +3,40 @@ module Arel
     class Sunstone
       private
 
+      def visit_Arel_Nodes_Ascending o, collector
+        hash = visit(o.expr, collector)
+        
+        case o.nulls
+        when :nulls_first
+          add_to_bottom_of_hash_or_array(hash, {asc: :nulls_first})
+        when :nulls_last
+          add_to_bottom_of_hash_or_array(hash, {asc: :nulls_last})
+        else
+          add_to_bottom_of_hash_or_array(hash, :asc)
+        end
+        
+        hash
+      end
+
+      def visit_Arel_Nodes_Descending o, collector
+        hash = visit(o.expr, collector)
+        
+        case o.nulls
+        when :nulls_first
+          add_to_bottom_of_hash_or_array(hash, {desc: :nulls_first})
+        when :nulls_last
+          add_to_bottom_of_hash_or_array(hash, {desc: :nulls_last})
+        else
+          add_to_bottom_of_hash_or_array(hash, :desc)
+        end
+        
+        hash
+      end
+      
+      def visit_Arel_Nodes_RandomOrdering o, collector
+        :random
+      end
+
       def visit_Hash o, collector
         value = {}
         o.each do |key, value|
