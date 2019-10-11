@@ -38,11 +38,15 @@ module Arel
       end
 
       def visit_Hash o, collector
-        value = {}
+        rvalue = {}
         o.each do |key, value|
-          value[visit(key, collector)] = visit(value, collector)
+          rvalue[visit(key, collector)] = visit(value, collector)
         end
-        value
+        rvalue
+      end
+      alias :visit_String                :literal
+      def visit_Symbol o, collector
+        o.to_s
       end
 
       def visit_Arel_Nodes_Contains o, collector

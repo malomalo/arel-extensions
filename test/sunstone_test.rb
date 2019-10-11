@@ -27,8 +27,11 @@ class SunstoneTest < ActiveSupport::TestCase
   # end
   
   test "::filter json_column: {contains: JSON_HASH}" do
-    query = Property.where(Property.arel_attribute('metadata').contains({json: 'string'}))
-    assert_equal '', query.to_sar.path
+    query = SunstoneProperty.where(SunstoneProperty.arel_attribute('metadata').contains({json: 'string'}))
+    assert_sar(query, 'GET', '/sunstone_properties', {
+      where: {metadata: {contains: { json: 'string' }}}
+    })
+    
     # query = Property.where(metadata: {contains: {json: 'string'}})
     # assert_equal(<<-SQL.strip.gsub(/\s+/, ' '), query.to_sql.strip)
     #   SELECT "properties".*

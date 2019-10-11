@@ -12,10 +12,12 @@ require 'rgeo'
 require "minitest/autorun"
 require 'minitest/unit'
 require 'minitest/reporters'
-# require 'webmock/minitest'
+require 'webmock/minitest'
 # require 'mocha/minitest'
 require 'active_record'
+require 'sunstone'
 require 'arel/extensions'
+
 
 # Setup the test db
 ActiveSupport.test_order = :random
@@ -27,7 +29,7 @@ $debugging = false
 
 # File 'lib/active_support/testing/declarative.rb', somewhere in rails....
 class ActiveSupport::TestCase
-  # include WebMock::API
+  include WebMock::API
   
   # File 'lib/active_support/testing/declarative.rb'
   def self.test(name, &block)
@@ -51,6 +53,51 @@ class ActiveSupport::TestCase
         req&.uri&.path == path && req.uri.query && unpack(req.uri.query.sub(/=true$/, '')) == query
       else
         req&.uri&.path == path && req.uri.query.nil?
+      end
+    end
+  end
+  
+  def setup
+    sunstone_schema = {
+      addresses: {
+        columns: {
+          id: { type: :integer, primary_key: true, null: false, array: false },
+          name: { type: :string, primary_key: false, null: true, array: false },
+          property_id: { type: :integer, primary_key: false, null: true, array: false }
+        }
+      },
+      properties: {
+        columns: {
+          id: { type: :integer, primary_key: true, null: false, array: false },
+          name: { type: :string, primary_key: false, null: true, array: false },
+          metadata: { type: :json, primary_key: false, null: true, array: false }
+        }
+      }
+    }
+    
+    req_stub = stub_request(:get, /^http:\/\/example.com/).with do |req|
+      case req.uri.path
+      when '/tables'
+        true
+      when /^\/\w+\/schema$/i
+        true
+      else
+        false
+      end
+    end
+    
+    req_stub.to_return do |req|
+      case req.uri.path
+      when '/tables'
+        {
+          body: sunstone_schema.keys.to_json,
+          headers: { 'StandardAPI-Version' => '5.0.0.5' }
+        }
+      when /^\/(\w+)\/schema$/i
+        {
+          body: sunstone_schema[$1.to_sym].to_json,
+          headers: { 'StandardAPI-Version' => '5.0.0.5' }
+        }
       end
     end
   end
@@ -112,6 +159,30 @@ class ActiveSupport::TestCase
   end
   ActiveSupport::Notifications.subscribe('sql.active_record', SQLLogger.new)
 
+  def deep_transform_query(object)
+    case object
+    when Hash
+      object.each_with_object({}) do |(key, value), result|
+        result[key.to_s] = deep_transform_query(value)
+      end
+    when Array
+      object.map {|e| deep_transform_query(e) }
+    when Symbol
+      object.to_s
+    else
+      object
+    end
+  end
+  
+  def assert_sar(query, method, path, query_params = {}, body = nil)
+    sar = query.to_sar
+
+    assert_equal method, sar.method
+    assert_equal path, sar.path.split('?').first
+    assert_equal deep_transform_query(query_params), MessagePack.unpack(CGI::unescape(sar.path.split('?').last))
+    assert_equal body, sar.body
+  end
+  
   def assert_sql(expected, query)
     assert_equal expected.strip, query.to_sql.strip.gsub(/\s+/, ' ')
   end

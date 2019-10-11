@@ -29,13 +29,23 @@ ActiveRecord::Migration.suppress_messages do
 end
 
 class Address < ActiveRecord::Base
-  
   belongs_to :property
-
 end
 
 class Property < ActiveRecord::Base
-  
   has_many :addresses
-
 end
+
+class SunstoneRecord < ActiveRecord::Base
+  self.abstract_class = true
+end
+
+class SunstoneAddress < SunstoneRecord
+  belongs_to :property, class_name: 'SunstoneProperty'
+end
+
+class SunstoneProperty < SunstoneRecord
+  has_many :addresses, class_name: 'SunstoneAddress'
+end
+
+SunstoneRecord.establish_connection(adapter: 'sunstone', url: 'http://example.com')
