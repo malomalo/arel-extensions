@@ -1,6 +1,6 @@
 Gem::Specification.new do |gem|
   gem.name = 'arel-extensions'
-  gem.version       = '6.0.0.6'
+  gem.version       = '6.0.0.7'
   gem.authors       = ["Jon Bracy"]
   gem.email         = ["jonbracy@gmail.com"]
   gem.summary       = %q{Adds support for missing SQL operators and functions to Arel}

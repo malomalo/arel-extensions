@@ -180,7 +180,11 @@ class ActiveSupport::TestCase
     assert_equal method, sar.method
     assert_equal path, sar.path.split('?').first
     assert_equal deep_transform_query(query_params), MessagePack.unpack(CGI::unescape(sar.path.split('?').last))
-    assert_equal body, sar.body
+    if body.nil?
+      assert_nil sar.body
+    else
+      assert_equal body, sar.body
+    end
   end
   
   def assert_sql(expected, query)

@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    arel-extensions (6.0.0.5)
+    arel-extensions (6.0.0.6)
       activerecord (>= 6.0.0)
 
 GEM

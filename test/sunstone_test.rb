@@ -97,5 +97,53 @@ class SunstoneTest < ActiveSupport::TestCase
   #   SQL
   # end
 
+  test '::order(column.asc)' do
+    query = SunstoneProperty.order(SunstoneProperty.arel_table[:id].asc)
+    assert_sar(query, 'GET', '/sunstone_properties', {
+      order: [{ id: :asc }]
+    })
+  end
+
+  test '::order(column1.asc, column2.asc)' do
+    query = SunstoneProperty.order(SunstoneProperty.arel_table[:id].asc, SunstoneProperty.arel_table[:name].asc)
+    assert_sar(query, 'GET', '/sunstone_properties', {
+      order: [{ id: :asc }, { name: :asc }]
+    })
+  end
+
+  test '::order(column.desc)' do
+    query = SunstoneProperty.order(SunstoneProperty.arel_table[:id].desc)
+    assert_sar(query, 'GET', '/sunstone_properties', {
+      order: [{ id: :desc }]
+    })
+  end
+
+  test '::order(column.asc(:nulls_first))' do
+    query = SunstoneProperty.order(SunstoneProperty.arel_table[:id].asc(:nulls_first))
+    assert_sar(query, 'GET', '/sunstone_properties', {
+      order: [{ id: { asc: :nulls_first } }]
+    })
+  end
+  
+  test '::order(column.asc(:nulls_last))' do
+    query = SunstoneProperty.order(SunstoneProperty.arel_table[:id].asc(:nulls_last))
+    assert_sar(query, 'GET', '/sunstone_properties', {
+      order: [{ id: { asc: :nulls_last } }]
+    })
+  end
+
+  test '::order(column.desc(:nulls_first))' do
+    query = SunstoneProperty.order(SunstoneProperty.arel_table[:id].desc(:nulls_first))
+    assert_sar(query, 'GET', '/sunstone_properties', {
+      order: [{ id: { desc: :nulls_first } }]
+    })
+  end
+  
+  test '::order(column.desc(:nulls_last))' do
+    query = SunstoneProperty.order(SunstoneProperty.arel_table[:id].desc(:nulls_last))
+    assert_sar(query, 'GET', '/sunstone_properties', {
+      order: [{ id: { desc: :nulls_last } }]
+    })
+  end
 
 end
