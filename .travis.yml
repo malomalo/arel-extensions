@@ -8,7 +8,6 @@ cache:
     - /home/travis/.rvm/gems
 
 rvm:
-  - 2.5
   - 2.6
 
 env:
@@ -43,7 +42,7 @@ install:
   - "sed -i \"/group :db do/a gem 'arel-extensions', require: 'arel/extensions', path: File.expand_path\\('~\\/build\\/malomalo\\/arel-extensions'\\)\" ~/build/rails/Gemfile"
   - sed -i "/rb-inotify/d" ~/build/rails/Gemfile
   - cat ~/build/rails/Gemfile
-  - bundle install --jobs=3 --retry=3
+  - bundle install --jobs=3 --retry=3 --full-index
   - popd
 
 script:
