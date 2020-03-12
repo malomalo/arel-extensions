@@ -8,7 +8,7 @@ cache:
     - /home/travis/.rvm/gems
 
 rvm:
-  - 2.7
+  - 2.6
 
 env:
   matrix:
@@ -25,6 +25,7 @@ before_install:
   - unset BUNDLE_GEMFILE
   - gem update --system
   - gem update bundler
+  - gem install bundler -v 1.17.3
 
 install:
   - git clone https://github.com/rails/rails.git ~/build/rails
