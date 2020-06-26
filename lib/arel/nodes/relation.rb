@@ -25,7 +25,11 @@ module Arel
           self.name == other.name &&
           self.collection == other.collection
       end
-      
+
+      def type_cast_for_database(value)
+        relation.type_cast_for_database(value)
+      end
+
     end
   end
 end
