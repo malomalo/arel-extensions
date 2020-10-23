@@ -153,6 +153,10 @@ module Arel
         visit(o.tsvector, collector) 
         collector << ', '
         visit(o.tsquery, collector)
+        if o.normalization
+          collector << ', '
+          visit(o.normalization, collector)
+        end
         collector << ')'
         collector
       end

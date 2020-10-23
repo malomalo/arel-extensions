@@ -133,4 +133,19 @@ class TSTest < ActiveSupport::TestCase
     SQL
   end
 
+  test 'ts_rank_cd(tsvector, tsquery, normalization)' do
+    query = Property.where(
+      Arel::Nodes::TSRankCD.new(
+        Arel::Nodes::TSVector.new(Property.arel_table[:name]),
+        Arel::Nodes::TSQuery.new('query'),
+        5
+      )
+    )
+    
+    assert_equal(<<~SQL.gsub(/( +|\n)/, ' ').strip, query.to_sql)
+      SELECT "properties".* FROM "properties"
+      WHERE ts_rank_cd(to_tsvector("properties"."name"), to_tsquery('query'), 5)
+    SQL
+  end
+
 end
