@@ -15,10 +15,5 @@ module Arel
       Arel::Nodes::Excludes.new(self, value)
     end
     
-    def overlaps(*values)
-      values = values[0] if values.size == 1 && values[0].is_a?(Array)
-      Arel::Nodes::Overlaps.new(self, values)
-    end
-    
   end
 end
