@@ -1,6 +1,8 @@
+require File.expand_path("../lib/arel/extensions/version", __FILE__)
+
 Gem::Specification.new do |gem|
   gem.name = 'arel-extensions'
-  gem.version       = '6.1.0.0'
+  gem.version       = Arel::Extensions::VERSION
   gem.authors       = ["Jon Bracy"]
   gem.email         = ["jonbracy@gmail.com"]
   gem.summary       = %q{Adds support for missing SQL operators and functions to Arel}
