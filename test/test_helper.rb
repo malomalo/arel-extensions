@@ -30,7 +30,7 @@ $debugging = false
 # File 'lib/active_support/testing/declarative.rb', somewhere in rails....
 class ActiveSupport::TestCase
   include WebMock::API
-  
+
   # File 'lib/active_support/testing/declarative.rb'
   def self.test(name, &block)
     test_name = "test_#{name.gsub(/\s+/, '_')}".to_sym
@@ -44,7 +44,7 @@ class ActiveSupport::TestCase
       end
     end
   end
-  
+
   def webmock(method, path, query=nil)
     query = deep_transform_query(query) if query
 
@@ -56,7 +56,7 @@ class ActiveSupport::TestCase
       end
     end
   end
-  
+
   def setup
     sunstone_schema = {
       addresses: {
@@ -74,7 +74,7 @@ class ActiveSupport::TestCase
         }
       }
     }
-    
+
     req_stub = stub_request(:get, /^http:\/\/example.com/).with do |req|
       case req.uri.path
       when '/tables'
@@ -85,7 +85,7 @@ class ActiveSupport::TestCase
         false
       end
     end
-    
+
     req_stub.to_return do |req|
       case req.uri.path
       when '/tables'
@@ -151,7 +151,7 @@ class ActiveSupport::TestCase
       unless ignore =~ sql
         if $debugging
         puts caller.select { |l| l.starts_with?(File.expand_path('../../lib', __FILE__)) }
-        puts "\n\n" 
+        puts "\n\n"
         end
       end
       self.class.log << sql unless ignore =~ sql
@@ -173,7 +173,7 @@ class ActiveSupport::TestCase
       object
     end
   end
-  
+
   def assert_sar(query, method, path, query_params = {}, body = nil)
     sar = query.to_sar
 
@@ -186,7 +186,7 @@ class ActiveSupport::TestCase
       assert_equal body, sar.body
     end
   end
-  
+
   def assert_sql(expected, query)
     assert_equal expected.strip, query.to_sql.strip.gsub(/\s+/, ' ')
   end
@@ -205,5 +205,5 @@ class ActiveSupport::TestCase
   alias :assert_not_predicate :refute_predicate
   alias :assert_not_respond_to :refute_respond_to
   alias :assert_not_same :refute_same
-  
+
 end

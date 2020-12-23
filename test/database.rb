@@ -1,15 +1,13 @@
-task = ActiveRecord::Tasks::PostgreSQLDatabaseTasks.new(ActiveRecord::DatabaseConfigurations.new({}).resolve({
-  'adapter' => 'postgresql',
-  'database' => "arel-extensions-test"
-}))
-task.drop
-task.create
-
 ActiveRecord::Base.establish_connection({
   adapter:  "postgresql",
   database: "arel-extensions-test",
   encoding: "utf8"
 })
+
+db_config = ActiveRecord::Base.connection_db_config
+task = ActiveRecord::Tasks::PostgreSQLDatabaseTasks.new(db_config)
+task.drop
+task.create
 
 ActiveRecord::Migration.suppress_messages do
   ActiveRecord::Schema.define do
@@ -18,7 +16,7 @@ ActiveRecord::Migration.suppress_messages do
       t.integer  "name"
       t.integer  "property_id"
     end
-    
+
     create_table "properties", force: :cascade do |t|
       t.string   "name",                 limit: 255
       t.tsvector 'vector_col'

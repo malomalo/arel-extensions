@@ -1,6 +1,8 @@
+require File.expand_path("../lib/arel/extensions/version", __FILE__)
+
 Gem::Specification.new do |gem|
   gem.name = 'arel-extensions'
-  gem.version       = '6.0.0.9'
+  gem.version       = Arel::Extensions::VERSION
   gem.authors       = ["Jon Bracy"]
   gem.email         = ["jonbracy@gmail.com"]
   gem.summary       = %q{Adds support for missing SQL operators and functions to Arel}
@@ -14,6 +16,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'activerecord', '>= 6.1.0'
 
   gem.add_development_dependency "bundler"
+  gem.add_development_dependency "byebug"
   gem.add_development_dependency "rake"
   gem.add_development_dependency 'minitest'
   gem.add_development_dependency 'minitest-reporters'
@@ -21,5 +24,5 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency "webmock"
   gem.add_development_dependency 'pg'
   gem.add_development_dependency 'rgeo'
-  
+
 end
