@@ -1,7 +1,7 @@
-task = ActiveRecord::Tasks::PostgreSQLDatabaseTasks.new({
+task = ActiveRecord::Tasks::PostgreSQLDatabaseTasks.new(ActiveRecord::DatabaseConfigurations.new({}).resolve({
   'adapter' => 'postgresql',
   'database' => "arel-extensions-test"
-})
+}))
 task.drop
 task.create
 
@@ -48,4 +48,4 @@ class SunstoneProperty < SunstoneRecord
   has_many :addresses, class_name: 'SunstoneAddress'
 end
 
-SunstoneRecord.establish_connection(adapter: 'sunstone', url: 'http://example.com')
+SunstoneRecord.establish_connection(adapter: 'sunstone', endpoint: 'http://example.com')

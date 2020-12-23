@@ -27,7 +27,7 @@ class SunstoneTest < ActiveSupport::TestCase
   # end
   
   test "::filter json_column: {contains: JSON_HASH}" do
-    query = SunstoneProperty.where(SunstoneProperty.arel_attribute('metadata').contains({json: 'string'}))
+    query = SunstoneProperty.where(SunstoneProperty.arel_table['metadata'].contains({json: 'string'}))
     assert_sar(query, 'GET', '/sunstone_properties', {
       where: {metadata: {contains: { json: 'string' }}}
     })
