@@ -58,8 +58,6 @@ before_script:
   - sed -i "/rb-inotify/d" ~/build/rails/Gemfile
   - cat ~/build/rails/Gemfile
   - rm ~/build/rails/Gemfile.lock
-  - "sed -i \"/# Active Record./a gem 'sunstone', path: File.expand_path\\('~\\/build\\/malomalo\\/sunstone'\\)\" ~/build/rails/Gemfile"
-  - cat ~/build/rails/Gemfile
   - bundle update --jobs=3 --retry=3
   - popd
   - bundle install --jobs=3 --retry=3
