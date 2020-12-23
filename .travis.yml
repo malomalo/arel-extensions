@@ -1,4 +1,4 @@
-dist: xenial
+dist: bionic
 language: ruby
 sudo: false
 
@@ -8,37 +8,62 @@ cache:
     - /home/travis/.rvm/gems
 
 rvm:
-  - 2.6
+  - 2.7
 
 env:
   matrix:
-    - RAILS_VERSION=v6.0.3.1 GEM=activerecord:mysql2
-    - RAILS_VERSION=v6.0.3.1 GEM=activerecord:sqlite3
-    - RAILS_VERSION=v6.0.3.1 GEM=activerecord:postgresql
+    - RAILS_VERSION=v6.1.0 TASK='db:mysql:rebuild mysql2:test'
+    - RAILS_VERSION=v6.1.0 TASK='db:mysql:rebuild mysql2:isolated_test'
+    - RAILS_VERSION=v6.1.0 TASK='db:postgresql:rebuild postgresql:test'
+    - RAILS_VERSION=v6.1.0 TASK='db:postgresql:rebuild postgresql:isolated_test'
+    - RAILS_VERSION=v6.1.0 TASK='sqlite3:test'
+    - RAILS_VERSION=v6.1.0 TASK='sqlite3:isolated_test'
+    - RAILS_VERSION=v6.1.0 TASK='sqlite3_mem:test'
 
 services:
   - mysql
 addons:
-  postgresql: "10"
+  postgresql: "13"
+  apt:
+    packages:
+    - postgresql-13
+    - postgresql-client-13
 
 before_install:
+  - sudo sed -i 's/port = 5433/port = 5432/' /etc/postgresql/13/main/postgresql.conf
+  - sudo cp /etc/postgresql/{9.3,13}/main/pg_hba.conf
+  - sudo pg_ctlcluster 13 main restart
   - unset BUNDLE_GEMFILE
   - gem update --system
   - gem update bundler
-  - gem install bundler -v 1.17.3
+  - gem install bundler --version 1.17.3
+  - mysql -e "create user rails@localhost;"
+  - mysql -e "grant all privileges on activerecord_unittest.* to rails@localhost;"
+  - mysql -e "grant all privileges on activerecord_unittest2.* to rails@localhost;"
+  - mysql -e "grant all privileges on inexistent_activerecord_unittest.* to rails@localhost;"
+  - mysql -e "create database activerecord_unittest default character set utf8mb4;"
+  - mysql -e "create database activerecord_unittest2 default character set utf8mb4;"
 
 install:
-  - git clone https://github.com/rails/rails.git ~/build/rails
+  - git clone --branch $RAILS_VERSION https://github.com/rails/rails.git ~/build/rails
+
+before_script:
+  - sed -i "s/t.warning = true/t.warning = false/g" Rakefile
   - pushd ~/build/rails
-  - git checkout $RAILS_VERSION
+  - git status
   - sed -i "s/Gem.ruby, '-w'/Gem.ruby, '-w0'/" ~/build/rails/activerecord/Rakefile
   - sed -i "s/t.warning = true/t.warning = false/g" ~/build/rails/activerecord/Rakefile
   - sed -i "/require 'support\/connection'/a \$LOAD_PATH.unshift\(File.expand_path\('~\/build\/malomalo\/arel-extensions\/lib'\)\)\nrequire 'arel/extensions'" ~/build/rails/activerecord/test/cases/helper.rb
   - "sed -i \"/group :db do/a gem 'arel-extensions', require: 'arel/extensions', path: File.expand_path\\('~\\/build\\/malomalo\\/arel-extensions'\\)\" ~/build/rails/Gemfile"
   - sed -i "/rb-inotify/d" ~/build/rails/Gemfile
   - cat ~/build/rails/Gemfile
-  - bundle install --jobs=3 --retry=3 --full-index
+  - rm ~/build/rails/Gemfile.lock
+  - "sed -i \"/# Active Record./a gem 'sunstone', path: File.expand_path\\('~\\/build\\/malomalo\\/sunstone'\\)\" ~/build/rails/Gemfile"
+  - cat ~/build/rails/Gemfile
+  - bundle update --jobs=3 --retry=3
   - popd
+  - bundle install --jobs=3 --retry=3
 
 script:
-  - cd ~/build/rails && ci/travis.rb
+  - bundle exec rake test
+  - cd ~/build/rails/activerecord && bundle exec rake $TASK

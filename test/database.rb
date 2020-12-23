@@ -46,4 +46,4 @@ class SunstoneProperty < SunstoneRecord
   has_many :addresses, class_name: 'SunstoneAddress'
 end
 
-SunstoneRecord.establish_connection(adapter: 'sunstone', url: 'http://example.com')
+SunstoneRecord.establish_connection(adapter: 'sunstone', endpoint: 'http://example.com')
