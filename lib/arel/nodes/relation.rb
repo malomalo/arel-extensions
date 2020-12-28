@@ -12,7 +12,7 @@ module Arel
       end
       
       def able_to_type_cast?
-        false
+        relation.able_to_type_cast?
       end
       
       def table_name

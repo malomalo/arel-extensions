@@ -28,18 +28,11 @@ module Arel
         collector << "RANDOM()"
       end
       
-      def visit_Arel_Nodes_ContainedBy o, collector
-        visit o.left, collector
-        collector << ' <@ '
-        collector << quote(o.left.type_cast_for_database(o.right))
-        collector
-      end
-
       def visit_Arel_Nodes_Excludes o, collector
         collector << 'NOT ('
         visit o.left, collector
         collector << ' @> '
-        collector << quote(o.left.type_cast_for_database(o.right))
+        visit o.right, collector
         collector << ')'
         collector
       end

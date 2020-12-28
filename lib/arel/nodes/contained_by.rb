@@ -1,6 +1,9 @@
 module Arel
   module Nodes
-    class ContainedBy < Binary
+    class ContainedBy < InfixOperation
+      def initialize(left, right)
+        super(:"<@", left, right)
+      end
     end
   end
 end
