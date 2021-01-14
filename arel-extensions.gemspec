@@ -20,7 +20,7 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency "rake"
   gem.add_development_dependency 'minitest'
   gem.add_development_dependency 'minitest-reporters'
-  gem.add_development_dependency "sunstone", '>= 6.1.0.rc1'
+  gem.add_development_dependency "sunstone", '>= 6.1.0'
   gem.add_development_dependency "webmock"
   gem.add_development_dependency 'pg'
   gem.add_development_dependency 'rgeo'
