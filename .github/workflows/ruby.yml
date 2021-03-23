@@ -8,10 +8,20 @@ on:
 
 jobs:
   sunstone:
-    name: ActiveRecord::Sort Test
+    name: Arel::Extensions Test
     runs-on: ubuntu-20.04
 
     steps:
+      - name: Install Postgresql
+        run: |
+          sudo apt-get install curl ca-certificates gnupg
+          curl https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+          sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+          sudo apt-get update
+          sudo apt-get install postgresql-13
+          sudo systemctl start postgresql@13-main.service
+          sudo -u postgres createuser runner --superuser
+          
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: 3.0
@@ -54,9 +64,9 @@ jobs:
           cat /home/runner/work/_temp/*.sh
           sed -i "s/Gem.ruby, '-w'/Gem.ruby, '-w0'/" ~/rails/activerecord/Rakefile
           sed -i "s/t.warning = true/t.warning = false/g" ~/rails/activerecord/Rakefile
-          sed -i "/require 'support\/connection'/a \$LOAD_PATH.unshift\(File.expand_path\(ENV['GITHUB_WORKSPACE']\)\)\nrequire 'active_record/sort'" ~/rails/activerecord/test/cases/helper.rb
+          sed -i "/require 'support\/connection'/a \$LOAD_PATH.unshift\(File.expand_path\(ENV['GITHUB_WORKSPACE']\)\)\nrequire 'arel/extensions'" ~/rails/activerecord/test/cases/helper.rb
           rm ~/rails/Gemfile.lock
-          sed -i "/# Active Record./a gem 'activerecord-sort', require: 'active_record/sort', path: File.expand_path\(ENV['GITHUB_WORKSPACE']\)" ~/rails/Gemfile
+          sed -i "/# Active Record./a gem 'arel-extensions', require: 'arel/extensions', path: File.expand_path\(ENV['GITHUB_WORKSPACE']\)" ~/rails/Gemfile
           cat ~/rails/Gemfile
           bundle update --jobs=3 --retry=3
 
@@ -87,9 +97,9 @@ jobs:
           cat /home/runner/work/_temp/*.sh
           sed -i "s/Gem.ruby, '-w'/Gem.ruby, '-w0'/" ~/rails/activerecord/Rakefile
           sed -i "s/t.warning = true/t.warning = false/g" ~/rails/activerecord/Rakefile
-          sed -i "/require 'support\/connection'/a \$LOAD_PATH.unshift\(File.expand_path\(ENV['GITHUB_WORKSPACE']\)\)\nrequire 'active_record/sort'" ~/rails/activerecord/test/cases/helper.rb
+          sed -i "/require 'support\/connection'/a \$LOAD_PATH.unshift\(File.expand_path\(ENV['GITHUB_WORKSPACE']\)\)\nrequire 'arel/extensions'" ~/rails/activerecord/test/cases/helper.rb
           rm ~/rails/Gemfile.lock
-          sed -i "/# Active Record./a gem 'activerecord-sort', require: 'active_record/sort', path: File.expand_path\(ENV['GITHUB_WORKSPACE']\)" ~/rails/Gemfile
+          sed -i "/# Active Record./a gem 'arel-extensions', require: 'arel/extensions', path: File.expand_path\(ENV['GITHUB_WORKSPACE']\)" ~/rails/Gemfile
           cat ~/rails/Gemfile
           bundle update --jobs=3 --retry=3
 
@@ -129,9 +139,9 @@ jobs:
           cat /home/runner/work/_temp/*.sh
           sed -i "s/Gem.ruby, '-w'/Gem.ruby, '-w0'/" ~/rails/activerecord/Rakefile
           sed -i "s/t.warning = true/t.warning = false/g" ~/rails/activerecord/Rakefile
-          sed -i "/require 'support\/connection'/a \$LOAD_PATH.unshift\(File.expand_path\(ENV['GITHUB_WORKSPACE']\)\)\nrequire 'active_record/sort'" ~/rails/activerecord/test/cases/helper.rb
+          sed -i "/require 'support\/connection'/a \$LOAD_PATH.unshift\(File.expand_path\(ENV['GITHUB_WORKSPACE']\)\)\nrequire 'arel/extensions'" ~/rails/activerecord/test/cases/helper.rb
           rm ~/rails/Gemfile.lock
-          sed -i "/# Active Record./a gem 'activerecord-sort', require: 'active_record/sort', path: File.expand_path\(ENV['GITHUB_WORKSPACE']\)" ~/rails/Gemfile
+          sed -i "/# Active Record./a gem 'arel-extensions', require: 'arel/extensions', path: File.expand_path\(ENV['GITHUB_WORKSPACE']\)" ~/rails/Gemfile/rails/Gemfile
           cat ~/rails/Gemfile
           bundle update --jobs=3 --retry=3
 
