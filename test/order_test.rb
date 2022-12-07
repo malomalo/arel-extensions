@@ -44,4 +44,40 @@ class OrderTest < ActiveSupport::TestCase
     SQL
   end
 
+  # Test reversing orders
+  test '::order(column.asc.reverse)' do
+    assert_sql(<<~SQL, Property.order(Property.arel_table[:id].asc.reverse))
+      SELECT "properties".* FROM "properties" ORDER BY "properties"."id" DESC
+    SQL
+  end
+
+  test '::order(column.desc.reverse)' do
+    assert_sql(<<~SQL, Property.order(Property.arel_table[:id].desc.reverse))
+      SELECT "properties".* FROM "properties" ORDER BY "properties"."id" ASC
+    SQL
+  end
+
+  test '::order(column.asc(:nulls_first).reverse)' do
+    assert_sql(<<~SQL, Property.order(Property.arel_table[:id].asc(:nulls_first).reverse))
+      SELECT "properties".* FROM "properties" ORDER BY "properties"."id" DESC NULLS LAST
+    SQL
+  end
+  
+  test '::order(column.asc(:nulls_last).reverse)' do
+    assert_sql(<<~SQL, Property.order(Property.arel_table[:id].asc(:nulls_last).reverse))
+      SELECT "properties".* FROM "properties" ORDER BY "properties"."id" DESC NULLS FIRST
+    SQL
+  end
+
+  test '::order(column.desc(:nulls_first).reverse)' do
+    assert_sql(<<~SQL, Property.order(Property.arel_table[:id].desc(:nulls_first).reverse))
+      SELECT "properties".* FROM "properties" ORDER BY "properties"."id" ASC NULLS LAST
+    SQL
+  end
+  
+  test '::order(column.desc(:nulls_last).reverse)' do
+    assert_sql(<<~SQL, Property.order(Property.arel_table[:id].desc(:nulls_last).reverse))
+      SELECT "properties".* FROM "properties" ORDER BY "properties"."id" ASC NULLS FIRST
+    SQL
+  end
 end
