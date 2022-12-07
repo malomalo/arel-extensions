@@ -9,6 +9,18 @@ module Arel
         @nulls = nulls
       end
 
+      def reverse
+        reverse_nulls = if nulls == :nulls_first
+          :nulls_last
+        elsif nulls
+          :nulls_first
+        else
+          nil
+        end
+        
+        Ascending.new(expr, reverse_nulls)
+      end
+      
     end
 
   end

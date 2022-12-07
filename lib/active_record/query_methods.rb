@@ -24,7 +24,7 @@ module ActiveRecord::QueryMethods
   end
   alias uniq_on! distinct_on!
 
-  def build_arel_with_distinct_on(aliases)
+  def build_arel_with_distinct_on(aliases = nil)
     arel = build_arel_without_distinct_on(aliases)
     arel.distinct_on(self.distinct_on_values) if !self.distinct_on_values.empty?
     arel
