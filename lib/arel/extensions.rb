@@ -1,5 +1,6 @@
 require "arel"
-require File.expand_path('../nodes/hex_encoded_binary', __FILE__)
+require File.expand_path('../nodes/binary_value', __FILE__)
+require File.expand_path('../nodes/hex_encoded_binary_value', __FILE__)
 
 require File.expand_path('../nodes/within', __FILE__)
 require File.expand_path('../nodes/excludes', __FILE__)

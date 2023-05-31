@@ -139,11 +139,14 @@ module Arel
         collector << ')'
         collector
       end
-      
-      def visit_Arel_Nodes_HexEncodedBinary(o, collector)
-        collector << "E'\\\\x"
-        collector << o.expr
-        collector << "'"
+
+      def visit_Arel_Nodes_BinaryValue(o, collector)
+        collector << quote(@connection.escape_bytea(o.expr))
+        collector
+      end
+            
+      def visit_Arel_Nodes_HexEncodedBinaryValue(o, collector)
+        collector << quote("\\x" + o.expr)
         collector
       end
 
