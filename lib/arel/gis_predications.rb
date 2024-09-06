@@ -12,7 +12,7 @@ module Arel
     private
 
     def geometry(value)
-      geom = case value
+      case value
       in Arel::Nodes::Node then value
       in RGeo::Geos::CAPIGeometryMethods then Arel::Nodes::Geometry.new(value)
       in ::String
