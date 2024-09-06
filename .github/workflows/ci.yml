@@ -35,8 +35,8 @@ jobs:
           bundler-cache: false # runs 'bundle install' and caches installed gems automatically
 
       - run: |
-          sed -i -e "s/gem.add_dependency 'activerecord', '>= [[:digit:]]\+.[[:digit:]]\+.[[:digit:]]\+'/gem.add_dependency 'activerecord', '${{ matrix.rails }}'/" arel-extensions.gemspec 
-          rm Gemfile.lock
+          sed -i -e "s/gem.add_dependency 'activerecord', '>= [[:digit:]]\+.[[:digit:]]\+.[[:digit:]]\+'/gem.add_dependency 'activerecord', '${{ matrix.rails }}'/" arel-extensions.gemspec
+          rm -f Gemfile.lock
           bundle
 
       - run: bundle exec rake test
