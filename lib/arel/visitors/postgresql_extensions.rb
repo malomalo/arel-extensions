@@ -2,12 +2,12 @@ module Arel
   module Visitors
     class PostgreSQL
       private
-      
+
       def column_for attr
         return nil if attr.is_a?(Arel::Attributes::Key)
         super
       end
-      
+
       def visit_Arel_Nodes_Ascending o, collector
         case o.nulls
         when :nulls_first then visit(o.expr, collector) << ' ASC NULLS FIRST'
@@ -23,11 +23,11 @@ module Arel
         else visit(o.expr, collector) << ' DESC'
         end
       end
-      
+
       def visit_Arel_Nodes_RandomOrdering o, collector
         collector << "RANDOM()"
       end
-      
+
       def visit_Arel_Nodes_Excludes o, collector
         collector << 'NOT ('
         visit o.left, collector
@@ -57,79 +57,79 @@ module Arel
 
       def visit_Arel_Nodes_HasKey(o, collector)
         right = o.right
-        
+
         collector = visit o.left, collector
-        
+
         collector << " ? " << quote(right.to_s)
         collector
       end
 
       def visit_Arel_Nodes_HasKeys(o, collector)
         right = o.right
-        
+
         collector = visit o.left, collector
-        
+
         collector << " ?& array[" << Array(right).map { |v| quote(v.to_s) }.join(',') << "]"
         collector
       end
-      
+
       def visit_Arel_Nodes_HasAnyKey(o, collector)
         right = o.right
-        
+
         collector = visit o.left, collector
-        
+
         collector << " ?| array[" << Array(right).map { |v| quote(v.to_s) }.join(',') << "]"
         collector
       end
-      
+
       def visit_Arel_Attributes_Cast(o, collector)
         collector << "("
         visit(o.relation, collector)
         collector << ")::#{o.name}"
         collector
       end
-      
+
       def visit_Arel_Nodes_TSMatch(o, collector)
         visit o.left, collector
         collector << ' @@ '
         visit o.right, collector
         collector
       end
-      
+
       def visit_Arel_Nodes_TSVector(o, collector)
         collector << 'to_tsvector('
         if o.language
-          visit(o.language, collector) 
+          visit(o.language, collector)
           collector << ', '
         end
-        visit(o.attribute, collector) 
+        visit(o.attribute, collector)
         collector << ')'
         collector
       end
-      
+
       def visit_Arel_Nodes_TSQuery(o, collector)
         collector << 'to_tsquery('
         if o.language
-          visit(o.language, collector) 
+          visit(o.language, collector)
           collector << ', '
         end
-        visit(o.expression, collector) 
+        visit(o.expression, collector)
         collector << ')'
         collector
       end
-      
+
       def visit_Arel_Nodes_TSRank(o, collector)
         collector << 'ts_rank('
-        visit(o.tsvector, collector) 
+        visit(o.tsvector, collector)
         collector << ', '
         visit(o.tsquery, collector)
         collector << ')'
         collector
       end
-      
+
       def visit_Arel_Nodes_TSRankCD(o, collector)
         collector << 'ts_rank_cd('
-        visit(o.tsvector, collector) 
+        visit(o.tsvector, collector)
         collector << ', '
         visit(o.tsquery, collector)
         if o.normalization
@@ -144,24 +144,19 @@ module Arel
         collector << quote(@connection.escape_bytea(o.expr))
         collector
       end
-            
-      def visit_Arel_Nodes_HexEncodedBinaryValue(o, collector)
-        collector << quote("\\x" + o.expr)
+
+      def visit_Arel_Nodes_Intersects o, collector
+        visit(Arel::Nodes::NamedFunction.new('ST_Intersects', [ o.left, o.right ]), collector)
         collector
       end
 
       def visit_Arel_Nodes_Within o, collector
-        envelope = if o.right.is_a?(Arel::Nodes::HexEncodedBinary)
-          Arel::Nodes::NamedFunction.new('ST_GeomFromEWKB', [o.right])
-        elsif o.right.is_a?(Arel::Nodes::Quoted) && o.right.expr.is_a?(String)
-          Arel::Nodes::NamedFunction.new('ST_GeomFromEWKT', [o.right])
-        elsif o.right.is_a?(Arel::Nodes::Quoted) && o.right.expr.is_a?(Hash)
-          Arel::Nodes::NamedFunction.new('ST_GeomFromGeoJSON', [Arel::Nodes.build_quoted(o.right.expr.to_json)])
-        else
-          raise 'within error'
-        end
+        visit(Arel::Nodes::NamedFunction.new('ST_Within', [ o.left, o.right ]), collector)
+        collector
+      end
 
-        visit(Arel::Nodes::NamedFunction.new('ST_Within', [o.left, envelope]), collector)
+      def visit_Arel_Nodes_Geometry o, collector
+        collector << quote(o.value.as_binary.each_byte.map { |b| b.to_s(16).rjust(2, '0') }.join)
         collector
       end
 
