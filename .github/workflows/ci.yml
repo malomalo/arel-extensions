@@ -37,7 +37,7 @@ jobs:
 
       - name: Test Geos
         run: |
-          bundle exec ruby -e "require 'rgeo'; puts RGeo::Geos::CAPIGeometryMethods"
+          bundle exec ruby -e "require 'rgeo'; puts RGeo::Geos.capi_supported?; puts RGeo::Geos::CAPIGeometryMethods"
 
       - run: |
           sed -i -e "s/gem.add_dependency 'activerecord', '>= [[:digit:]]\+.[[:digit:]]\+.[[:digit:]]\+'/gem.add_dependency 'activerecord', '${{ matrix.rails }}'/" arel-extensions.gemspec 
