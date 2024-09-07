@@ -47,7 +47,7 @@ jobs:
 
     strategy:
       matrix:
-        rails: ['v7.0.8', 'v7.1.2']
+        rails: ['v7.0.8.4', 'v7.1.4']
         ruby-version: ['3.2']
         postgres-version: ['15']
 
