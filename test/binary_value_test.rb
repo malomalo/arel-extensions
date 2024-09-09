@@ -11,4 +11,13 @@ class BinaryValueTest < ActiveSupport::TestCase
     SQL
   end
 
+  test 'hex encoded binary value' do
+    query = Property.where( Arel::Nodes::HexEncodedBinaryValue.new("0101000000c04b9b84d02e3c400896a26e84252640") )
+
+    assert_equal(<<~SQL.gsub(/( +|\n)/, ' ').strip, query.to_sql)
+      SELECT "properties".* FROM "properties"
+      WHERE '\\x0101000000c04b9b84d02e3c400896a26e84252640'
+    SQL
+  end
+
 end

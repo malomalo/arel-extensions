@@ -145,6 +145,11 @@ module Arel
         collector
       end
 
+      def visit_Arel_Nodes_HexEncodedBinaryValue(o, collector)
+        collector << quote("\\x" + o.expr)
+        collector
+      end
+
       def visit_Arel_Nodes_Intersects o, collector
         visit(Arel::Nodes::NamedFunction.new('ST_Intersects', [ o.left, o.right ]), collector)
         collector
