@@ -9,6 +9,7 @@ $LOAD_PATH << File.expand_path('../lib', __FILE__)
 # end
 
 require 'rgeo'
+require 'debug'
 require "minitest/autorun"
 require 'minitest/unit'
 require 'minitest/reporters'
@@ -17,7 +18,7 @@ require 'webmock/minitest'
 require 'active_record'
 require 'sunstone'
 require 'arel/extensions'
-
+require 'activerecord-postgis-adapter'
 
 # Setup the test db
 ActiveSupport.test_order = :random

@@ -1,10 +1,12 @@
 require "arel"
 require File.expand_path('../nodes/binary_value', __FILE__)
-require File.expand_path('../nodes/hex_encoded_binary_value', __FILE__)
 
-require File.expand_path('../nodes/within', __FILE__)
-require File.expand_path('../nodes/excludes', __FILE__)
-require File.expand_path('../nodes/contained_by', __FILE__)
+require_relative "./nodes/geometry"
+require_relative "./nodes/intersects"
+require_relative "./nodes/within"
+require_relative "./nodes/excludes"
+require_relative "./nodes/contained_by"
+
 require File.expand_path('../array_predications', __FILE__)
 Arel::Attributes::Attribute.include(Arel::ArrayPredications)
 

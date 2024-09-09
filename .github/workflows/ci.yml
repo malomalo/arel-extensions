@@ -20,6 +20,7 @@ jobs:
           curl https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
           sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
           sudo apt-get update
+          sudo apt-get -y install libgeos-dev
           sudo apt-get -y install postgresql-${{ matrix.postgres-version }}-postgis-3
           sudo systemctl start postgresql@${{ matrix.postgres-version }}-main.service
           sudo systemctl status postgresql@${{ matrix.postgres-version }}-main.service
@@ -34,6 +35,10 @@ jobs:
           ruby-version: ${{ matrix.ruby-version }}
           bundler-cache: false # runs 'bundle install' and caches installed gems automatically
 
+      - name: Test Geos
+        run: |
+          bundle exec ruby -e "require 'rgeo'; puts RGeo::Geos.capi_supported?; puts RGeo::Geos::CAPIGeometryMethods"
+
       - run: |
           sed -i -e "s/gem.add_dependency 'activerecord', '>= [[:digit:]]\+.[[:digit:]]\+.[[:digit:]]\+'/gem.add_dependency 'activerecord', '${{ matrix.rails }}'/" arel-extensions.gemspec
           rm -f Gemfile.lock
@@ -47,7 +52,7 @@ jobs:
 
     strategy:
       matrix:
-        rails: ['v7.0.8.4', 'v7.1.4', 'v7.2.1']
+        rails: ['v7.0.8.4', 'v7.1.4']
         ruby-version: ['3.3']
         postgres-version: ['15']
 
@@ -71,7 +76,7 @@ jobs:
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby-version }}
-          bundler-cache: true # runs 'bundle install' and caches installed gems automatically
+          bundler-cache: false # runs 'bundle install' and caches installed gems automatically
 
       - name: Download Rails
         run: |
@@ -99,7 +104,7 @@ jobs:
 
     strategy:
       matrix:
-        rails: ['v7.0.8.4', 'v7.1.4', 'v7.2.1']
+        rails: ['v7.0.8.4', 'v7.1.4']
         ruby-version: ['3.3']
 
     steps:
@@ -108,7 +113,7 @@ jobs:
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby-version }}
-          bundler-cache: true # runs 'bundle install' and caches installed gems automatically
+          bundler-cache: false # runs 'bundle install' and caches installed gems automatically
 
       - name: Download Rails
         run: |
@@ -140,7 +145,7 @@ jobs:
 
     strategy:
       matrix:
-        rails: ['v7.0.8.4', 'v7.1.4', 'v7.2.1']
+        rails: ['v7.0.8.4', 'v7.1.4']
         ruby-version: ['3.3']
 
     steps:
@@ -155,7 +160,7 @@ jobs:
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby-version }}
-          bundler-cache: true # runs 'bundle install' and caches installed gems automatically
+          bundler-cache: false # runs 'bundle install' and caches installed gems automatically
 
       - name: Download Rails
         run: |

@@ -1,5 +1,5 @@
 ActiveRecord::Base.establish_connection({
-  adapter:  "postgresql",
+  adapter:  "postgis",
   database: "arel-extensions-test",
   encoding: "utf8"
 })
@@ -11,10 +11,12 @@ task.create
 
 ActiveRecord::Migration.suppress_messages do
   ActiveRecord::Schema.define do
+    enable_extension "postgis"
 
     create_table "addresses", force: :cascade do |t|
       t.integer  "name"
       t.integer  "property_id"
+      t.geometry "location",             limit: {:type=>"Point", :srid=>"4326"}
     end
 
     create_table "properties", force: :cascade do |t|
