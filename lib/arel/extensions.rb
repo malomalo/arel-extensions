@@ -1,5 +1,6 @@
 require "arel"
 require File.expand_path('../nodes/binary_value', __FILE__)
+require File.expand_path('../nodes/hex_encoded_binary_value', __FILE__)
 
 require_relative "./nodes/geometry"
 require_relative "./nodes/intersects"
