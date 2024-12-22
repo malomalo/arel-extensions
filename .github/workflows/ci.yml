@@ -7,6 +7,7 @@ jobs:
     name: Arel::Extensions Test
     runs-on: ubuntu-22.04
     strategy:
+      fail-fast: false
       matrix:
         rails: ['7.0.8.7', '7.1.5.1', '7.2.2.1', '8.0.1']
         ruby-version: ['3.1', '3.2', '3.3', '3.4.0-rc1']
