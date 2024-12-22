@@ -35,14 +35,14 @@ jobs:
           ruby-version: ${{ matrix.ruby-version }}
           bundler-cache: false # runs 'bundle install' and caches installed gems automatically
 
-      - name: Test Geos
-        run: |
-          bundle exec ruby -e "require 'rgeo'; puts RGeo::Geos.capi_supported?; puts RGeo::Geos::CAPIGeometryMethods"
-
       - run: |
           sed -i -e "s/gem.add_dependency 'activerecord', '>= [[:digit:]]\+.[[:digit:]]\+.[[:digit:]]\+'/gem.add_dependency 'activerecord', '${{ matrix.rails }}'/" arel-extensions.gemspec
           rm -f Gemfile.lock
           bundle
+
+      - name: Test Geos
+        run: |
+          bundle exec ruby -e "require 'rgeo'; puts RGeo::Geos.capi_supported?; puts RGeo::Geos::CAPIGeometryMethods"
 
       - run: bundle exec rake test
 
