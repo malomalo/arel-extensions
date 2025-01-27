@@ -105,7 +105,7 @@ jobs:
 
       - name: Fix Weird Test Cases
         run: |
-          sed -i "/QUERYING_METHODS =/a [:distinct_on, :uniq_on] +" ~/rails/activerecord/test/cases/relation/delegation_test.rb
+          sed -i "s/} - [:all/} - [:all, :distinct_on, :uniq_on/" ~/rails/activerecord/test/cases/relation/delegation_test.rb
 
       - run: |
           pushd ~/rails/activerecord
@@ -148,7 +148,7 @@ jobs:
 
       - name: Fix Weird Test Cases
         run: |
-          sed -i "/QUERYING_METHODS =/a [:distinct_on, :uniq_on] +" ~/rails/activerecord/test/cases/relation/delegation_test.rb
+          sed -i "s/} - [:all/} - [:all, :distinct_on, :uniq_on/" ~/rails/activerecord/test/cases/relation/delegation_test.rb
 
       - run: |
           pushd ~/rails/activerecord
@@ -201,7 +201,7 @@ jobs:
 
       - name: Fix Weird Test Cases
         run: |
-          sed -i "/QUERYING_METHODS =/a [:distinct_on, :uniq_on] +" ~/rails/activerecord/test/cases/relation/delegation_test.rb
+          sed -i "s/} - [:all/} - [:all, :distinct_on, :uniq_on/" ~/rails/activerecord/test/cases/relation/delegation_test.rb
 
       - run: |
           pushd ~/rails/activerecord
