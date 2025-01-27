@@ -8,7 +8,17 @@ module Arel
         @attribute = attribute
         @language = Arel::Nodes.build_quoted(language) if language
       end
-      
+
+      def hash
+        [@attribute, @language].hash
+      end
+
+      def eql? other
+        self.class == other.class &&
+        self.attribute == other.attribute &&
+        self.language == other.language
+      end
+      alias :== :eql?
     end
   end
 end

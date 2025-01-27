@@ -9,6 +9,17 @@ module Arel
         @tsquery = tsquery
       end
 
+      def hash
+        [@tsvector, @tsquery].hash
+      end
+
+      def eql? other
+        self.class == other.class &&
+        self.tsvector == other.tsvector &&
+        self.tsquery == other.tsquery
+      end
+      alias :== :eql?
+
     end
   end
 end
