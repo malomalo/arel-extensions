@@ -105,7 +105,7 @@ jobs:
 
       - name: Fix Weird Test Cases
         run: |
-          sed -i "s/} - [:all/} - [:all, :distinct_on, :uniq_on/" ~/rails/activerecord/test/cases/relation/delegation_test.rb
+          sed -i "s|} - [:all|} - [:all, :distinct_on, :uniq_on|" ~/rails/activerecord/test/cases/relation/delegation_test.rb
 
       - run: |
           pushd ~/rails/activerecord
@@ -148,7 +148,7 @@ jobs:
 
       - name: Fix Weird Test Cases
         run: |
-          sed -i "s/} - [:all/} - [:all, :distinct_on, :uniq_on/" ~/rails/activerecord/test/cases/relation/delegation_test.rb
+          sed -i "s|} - [:all|} - [:all, :distinct_on, :uniq_on|" ~/rails/activerecord/test/cases/relation/delegation_test.rb
 
       - run: |
           pushd ~/rails/activerecord
@@ -161,7 +161,6 @@ jobs:
   ar-mysql:
     name: ActiveRecord MySQL Test
     runs-on: ubuntu-22.04
-
 
     strategy:
       fail-fast: false
@@ -201,7 +200,7 @@ jobs:
 
       - name: Fix Weird Test Cases
         run: |
-          sed -i "s/} - [:all/} - [:all, :distinct_on, :uniq_on/" ~/rails/activerecord/test/cases/relation/delegation_test.rb
+          sed -i "s|} - [:all|} - [:all, :distinct_on, :uniq_on|" ~/rails/activerecord/test/cases/relation/delegation_test.rb
 
       - run: |
           pushd ~/rails/activerecord
