@@ -1,5 +1,5 @@
 module Arel
   module Extensions
-    VERSION = '7.0.3'
+    VERSION = '8.0.0'
   end
 end
