@@ -24,6 +24,6 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency "webmock"
   gem.add_development_dependency 'pg'
   gem.add_development_dependency 'rgeo'
-  gem.add_development_dependency "activerecord-postgis-adapter"
+  gem.add_development_dependency "activerecord-postgis-adapter", '>= 8.0'
 
 end
