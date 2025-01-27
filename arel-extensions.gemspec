@@ -13,7 +13,7 @@ Gem::Specification.new do |gem|
   gem.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
   gem.require_paths = ["lib"]
 
-  gem.add_dependency 'activerecord', '>= 7.0.0', '< 7.2'
+  gem.add_dependency 'activerecord', '>= 7.0.0', '< 8.1'
 
   gem.add_development_dependency "bundler"
   gem.add_development_dependency "debug"
@@ -24,6 +24,6 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency "webmock"
   gem.add_development_dependency 'pg'
   gem.add_development_dependency 'rgeo'
-  gem.add_development_dependency "activerecord-postgis-adapter"
+  gem.add_development_dependency "activerecord-postgis-adapter", '>= 8.0'
 
 end
