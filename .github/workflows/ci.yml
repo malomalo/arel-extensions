@@ -39,6 +39,10 @@ jobs:
           ruby-version: ${{ matrix.ruby-version }}
           bundler-cache: false # runs 'bundle install' and caches installed gems automatically
 
+      - name: Fix activerecord-postgis-adapter
+        if: ${{ matrix.rails == '8.0.1' }}
+        run: cat "gem 'activerecord-postgis-adapter', github: 'rgeo/activerecord-postgis-adapter', branch: 'rails8'" >> Gemfile
+
       - run: |
           sed -i -e "s/gem.add_dependency 'activerecord', '>= [[:digit:]]\+.[[:digit:]]\+.[[:digit:]]\+'/gem.add_dependency 'activerecord', '${{ matrix.rails }}'/" arel-extensions.gemspec
           rm -f Gemfile.lock
