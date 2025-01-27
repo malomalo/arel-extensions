@@ -103,6 +103,10 @@ jobs:
           cat ~/rails/Gemfile
           bundle update --jobs=3 --retry=3
 
+      - name: Fix Weird Test Cases
+        run: |
+          sed -i "/QUERYING_METHODS =/a [:distinct_on, :uniq_on] +" ~/rails/activerecord/test/cases/relation/delegation_test.rb
+
       - run: |
           pushd ~/rails/activerecord
           bundle exec rake db:postgresql:rebuild postgresql:test --trace
@@ -141,6 +145,10 @@ jobs:
           sed -i "s/# frozen_string_literal: true/# frozen_string_literal: true\nrequire 'ostruct'/" ~/rails/activerecord/test/cases/encryption/configurable_test.rb
           cat ~/rails/Gemfile
           bundle update --jobs=3 --retry=3
+
+      - name: Fix Weird Test Cases
+        run: |
+          sed -i "/QUERYING_METHODS =/a [:distinct_on, :uniq_on] +" ~/rails/activerecord/test/cases/relation/delegation_test.rb
 
       - run: |
           pushd ~/rails/activerecord
@@ -190,6 +198,10 @@ jobs:
           sed -i "s/# frozen_string_literal: true/# frozen_string_literal: true\nrequire 'ostruct'/" ~/rails/activerecord/test/cases/encryption/configurable_test.rb
           cat ~/rails/Gemfile
           bundle update --jobs=3 --retry=3
+
+      - name: Fix Weird Test Cases
+        run: |
+          sed -i "/QUERYING_METHODS =/a [:distinct_on, :uniq_on] +" ~/rails/activerecord/test/cases/relation/delegation_test.rb
 
       - run: |
           pushd ~/rails/activerecord
