@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'active_record'
 require 'active_record/relation'
 require 'active_record/querying'

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Ordering with :nulls_last, :nulls_first options
 module Arel
   module OrderPredications
