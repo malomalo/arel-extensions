@@ -5,16 +5,13 @@ on: [push, pull_request]
 jobs:
   sunstone:
     name: Arel::Extensions Test
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
         rails: ['7.1.5.1', '7.2.2.1', '8.0.1']
-        ruby-version: ['3.1', '3.2', '3.3', '3.4']
+        ruby-version: ['3.2', '3.3', '3.4', '3.5.0-preview1']
         postgres-version: ['17']
-        exclude:
-          - rails: '8.0.1'
-            ruby-version: '3.1'
 
     steps:
       - name: Install Postgresql
@@ -39,11 +36,6 @@ jobs:
           ruby-version: ${{ matrix.ruby-version }}
           bundler-cache: false # runs 'bundle install' and caches installed gems automatically
 
-      - name: Fix activerecord-postgis-adapter
-        if: ${{ matrix.rails == '8.0.1' }}
-        run: |
-          echo "gem 'activerecord-postgis-adapter', github: 'rgeo/activerecord-postgis-adapter', branch: 'rails8'" >> Gemfile
-
       - run: |
           sed -i -e "s/gem.add_dependency 'activerecord', '>= [[:digit:]]\+.[[:digit:]]\+.[[:digit:]]\+'/gem.add_dependency 'activerecord', '${{ matrix.rails }}'/" arel-extensions.gemspec
           rm -f Gemfile.lock
@@ -57,14 +49,18 @@ jobs:
 
   ar-postgresql:
     name: ActiveRecord PostgresQL Test
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     strategy:
       fail-fast: false
       matrix:
-        rails: ['7.1.5.1', '7.2.2.1', '8.0.1']
-        ruby-version: ['3.3']
+        rails: ['7.2.2.1', '8.0.1']
+        ruby-version: ['3.4']
         postgres-version: ['17']
+        include:
+          - rails: '7.1.5.1'
+            ruby-version: '3.3'
+            postgres-version: '17'
 
     steps:
       - name: Install Postgresql
@@ -114,14 +110,16 @@ jobs:
           
   ar-sqlite:
     name: ActiveRecord SQLite Test
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     strategy:
       fail-fast: false
       matrix:
-        rails: ['7.1.5.1', '7.2.2.1', '8.0.1']
-        ruby-version: ['3.3']
-        postgres-version: ['17']
+        rails: ['7.2.2.1', '8.0.1']
+        ruby-version: ['3.4']
+        include:
+          - rails: '7.1.5.1'
+            ruby-version: '3.3'
 
     steps:
       - uses: actions/checkout@v4
@@ -150,10 +148,6 @@ jobs:
         run: |
           sed -i 's|} - \[:|} - \[:distinct_on, :uniq_on, :|' ~/rails/activerecord/test/cases/relation/delegation_test.rb
 
-      - name: Fix Weird Test Cases
-        run: |
-          cat ~/rails/activerecord/test/cases/relation/delegation_test.rb
-
       - run: |
           pushd ~/rails/activerecord
           bundle exec rake sqlite3:test --trace
@@ -164,14 +158,16 @@ jobs:
         
   ar-mysql:
     name: ActiveRecord MySQL Test
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     strategy:
       fail-fast: false
       matrix:
-        rails: ['7.1.5.1', '7.2.2.1', '8.0.1']
-        ruby-version: ['3.3']
-        postgres-version: ['17']
+        rails: ['7.2.2.1', '8.0.1']
+        ruby-version: ['3.4']
+        include:
+          - rails: '7.1.5.1'
+            ruby-version: '3.3'
 
     steps:
       - name: Install MySQL
