@@ -27,8 +27,14 @@ module ActiveRecord::QueryMethods
   alias uniq_on! distinct_on!
 
   private
-  
-  if ActiveRecord.version >= "7.2"
+
+  if ActiveRecord.version >= "8.1"
+    def build_arel_with_distinct_on(aliases = nil)
+      arel = build_arel_without_distinct_on(aliases)
+      arel.distinct_on(self.distinct_on_values) if !self.distinct_on_values.empty?
+      arel
+    end
+  elsif ActiveRecord.version >= "7.2"
     def build_arel_with_distinct_on(connection, aliases = nil)
       arel = build_arel_without_distinct_on(connection, aliases)
       arel.distinct_on(self.distinct_on_values) if !self.distinct_on_values.empty?

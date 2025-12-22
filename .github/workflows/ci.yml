@@ -9,9 +9,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        rails: ['7.1.5.1', '7.2.2.1', '8.0.1']
-        ruby-version: ['3.2', '3.3', '3.4', '3.5.0-preview1']
-        postgres-version: ['17']
+        rails-version:
+          - 7.1.6
+          - 7.2.3
+          - 8.0.4
+          - 8.1.1
+        ruby-version:
+          - 3.3
+          - 3.4
+          - 4.0.0-preview2
+        postgres-version:
+          - 17
 
     steps:
       - name: Install Postgresql
@@ -37,9 +45,9 @@ jobs:
           bundler-cache: false # runs 'bundle install' and caches installed gems automatically
 
       - run: |
-          sed -i -e "s/gem.add_dependency 'activerecord', '>= [[:digit:]]\+.[[:digit:]]\+.[[:digit:]]\+'/gem.add_dependency 'activerecord', '${{ matrix.rails }}'/" arel-extensions.gemspec
+          sed -i -e "s/gem.add_dependency 'activerecord', '>= [[:digit:]]\+.[[:digit:]]\+.[[:digit:]]\+'/gem.add_dependency 'activerecord', '${{ matrix.rails-version }}'/" arel-extensions.gemspec
           rm -f Gemfile.lock
-          bundle
+          bundle install --jobs=3 --retry=3
 
       - name: Test Geos
         run: |
@@ -54,11 +62,16 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        rails: ['7.2.2.1', '8.0.1']
-        ruby-version: ['3.4']
-        postgres-version: ['17']
+        rails-version:
+          - 7.2.3
+          - 8.0.4
+          - 8.1.1
+        ruby-version:
+          - 3.4
+        postgres-version:
+          - 17
         include:
-          - rails: '7.1.5.1'
+          - rails-version: '7.1.6'
             ruby-version: '3.3'
             postgres-version: '17'
 
@@ -86,7 +99,7 @@ jobs:
 
       - name: Download Rails
         run: |
-          git clone --branch v${{ matrix.rails }} https://github.com/rails/rails.git ~/rails
+          git clone --branch v${{ matrix.rails-version }} https://github.com/rails/rails.git ~/rails
           pushd ~/rails
           cat /home/runner/work/_temp/*.sh
           sed -i "s/Gem.ruby, '-w'/Gem.ruby, '-w0'/" ~/rails/activerecord/Rakefile
@@ -97,12 +110,23 @@ jobs:
           echo "gem 'ostruct'" >> ~/rails/Gemfile
           sed -i "s/# frozen_string_literal: true/# frozen_string_literal: true\nrequire 'ostruct'/" ~/rails/activerecord/test/cases/encryption/configurable_test.rb
           cat ~/rails/Gemfile
-          bundle update --jobs=3 --retry=3
+
+      - name: This can eventually be removed
+        run: |
+          sed -i 's/gem "minitest"$/gem "minitest"\ngem "minitest-mock", require: "minitest\/mock"/' ~/rails/Gemfile
+          sed -i 's/module ActiveRecord$/module Rails\nend\nmodule ActiveRecord/' ~/rails/activerecord/test/cases/adapters/postgresql/postgresql_adapter_test.rb || true
+          sed -i 's/t.options = "--profile" if ENV\["CI"\]//g' ~/rails/activerecord/Rakefile
 
       - name: Fix Weird Test Cases
         run: |
           sed -i 's|} - \[:|} - \[:distinct_on, :uniq_on, :|' ~/rails/activerecord/test/cases/relation/delegation_test.rb
 
+      - name: Bundle
+        run: |
+          pushd ~/rails
+          bundle update --jobs=3 --retry=3
+          popd
+          
       - run: |
           pushd ~/rails/activerecord
           bundle exec rake db:postgresql:rebuild postgresql:test --trace
@@ -115,10 +139,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        rails: ['7.2.2.1', '8.0.1']
-        ruby-version: ['3.4']
+        rails-version:
+          - 7.2.3
+          - 8.0.4
+          - 8.1.1
+        ruby-version:
+          - 3.4
         include:
-          - rails: '7.1.5.1'
+          - rails-version: '7.1.6'
             ruby-version: '3.3'
 
     steps:
@@ -131,7 +159,7 @@ jobs:
 
       - name: Download Rails
         run: |
-          git clone --branch v${{ matrix.rails }} https://github.com/rails/rails.git ~/rails
+          git clone --branch v${{ matrix.rails-version }} https://github.com/rails/rails.git ~/rails
           pushd ~/rails
           cat /home/runner/work/_temp/*.sh
           sed -i "s/Gem.ruby, '-w'/Gem.ruby, '-w0'/" ~/rails/activerecord/Rakefile
@@ -142,11 +170,25 @@ jobs:
           echo "gem 'ostruct'" >> ~/rails/Gemfile
           sed -i "s/# frozen_string_literal: true/# frozen_string_literal: true\nrequire 'ostruct'/" ~/rails/activerecord/test/cases/encryption/configurable_test.rb
           cat ~/rails/Gemfile
-          bundle update --jobs=3 --retry=3
+
+      - name: This can eventually be removed
+        run: |
+          sed -i 's/gem "minitest"$/gem "minitest"\ngem "minitest-mock", require: "minitest\/mock"/' ~/rails/Gemfile
+          cat ~/rails/Gemfile
+          sed -i 's/module ActiveRecord$/module Rails\nend\nmodule ActiveRecord/' ~/rails/activerecord/test/cases/adapters/sqlite3/dbconsole_test.rb
+          cat  ~/rails/activerecord/test/cases/adapters/sqlite3/dbconsole_test.rb
+          sed -i 's/t.options = "--profile" if ENV\["CI"\]//g' ~/rails/activerecord/Rakefile
+          cat ~/rails/activerecord/Rakefile
 
       - name: Fix Weird Test Cases
         run: |
           sed -i 's|} - \[:|} - \[:distinct_on, :uniq_on, :|' ~/rails/activerecord/test/cases/relation/delegation_test.rb
+
+      - name: Bundle
+        run: |
+          pushd ~/rails
+          bundle update --jobs=3 --retry=3
+          popd
 
       - run: |
           pushd ~/rails/activerecord
@@ -163,10 +205,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        rails: ['7.2.2.1', '8.0.1']
-        ruby-version: ['3.4']
+        rails-version:
+          - 7.2.3
+          - 8.0.4
+          - 8.1.1
+        ruby-version:
+          - 3.4
         include:
-          - rails: '7.1.5.1'
+          - rails-version: '7.1.6'
             ruby-version: '3.3'
 
     steps:
@@ -185,7 +231,7 @@ jobs:
 
       - name: Download Rails
         run: |
-          git clone --branch v${{ matrix.rails }} https://github.com/rails/rails.git ~/rails
+          git clone --branch v${{ matrix.rails-version }} https://github.com/rails/rails.git ~/rails
           pushd ~/rails
           cat /home/runner/work/_temp/*.sh
           sed -i "s/Gem.ruby, '-w'/Gem.ruby, '-w0'/" ~/rails/activerecord/Rakefile
@@ -196,11 +242,24 @@ jobs:
           echo "gem 'ostruct'" >> ~/rails/Gemfile
           sed -i "s/# frozen_string_literal: true/# frozen_string_literal: true\nrequire 'ostruct'/" ~/rails/activerecord/test/cases/encryption/configurable_test.rb
           cat ~/rails/Gemfile
-          bundle update --jobs=3 --retry=3
+
+      - name: This can eventually be removed
+        run: |
+          sed -i 's/gem "minitest"$/gem "minitest"\ngem "minitest-mock", require: "minitest\/mock"/' ~/rails/Gemfile
+          sed -i 's/class WarningsTest < ActiveRecord::AbstractMysqlTestCase$/module Rails\nend\nclass WarningsTest < ActiveRecord::AbstractMysqlTestCase/' ~/rails/activerecord/test/cases/adapters/abstract_mysql_adapter/warnings_test.rb || true
+          sed -i 's/class Mysql2AdapterTest < ActiveRecord::Mysql2TestCase$/module Rails\nend\nclass Mysql2AdapterTest < ActiveRecord::Mysql2TestCase/' ~/rails/activerecord/test/cases/adapters/mysql2/mysql2_adapter_test.rb || true
+          sed -i 's/t.options = "--profile" if ENV\["CI"\]//g' ~/rails/activerecord/Rakefile
+          cat ~/rails/activerecord/Rakefile
 
       - name: Fix Weird Test Cases
         run: |
           sed -i 's|} - \[:|} - \[:distinct_on, :uniq_on, :|' ~/rails/activerecord/test/cases/relation/delegation_test.rb
+
+      - name: Bundle
+        run: |
+          pushd ~/rails
+          bundle update --jobs=3 --retry=3
+          popd
 
       - run: |
           pushd ~/rails/activerecord
