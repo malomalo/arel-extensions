@@ -125,6 +125,17 @@ jobs:
           sed -i "s/# frozen_string_literal: true/# frozen_string_literal: true\nrequire 'ostruct'/" ~/rails/activerecord/test/cases/encryption/configurable_test.rb
           cat ~/rails/Gemfile
 
+      - name: This can eventually be removed
+        run: |
+          # minitest/mock isn't auto-required by the standalone AR suite; force it.
+          sed -i 's/gem "minitest"$/gem "minitest"\ngem "minitest-mock", require: "minitest\/mock"/' ~/rails/Gemfile
+          # postgresql_adapter_test.rb calls Rails.define_singleton_method(:error);
+          # Rails is undefined when the suite runs standalone, so stub an empty module.
+          sed -i 's/module ActiveRecord$/module Rails\nend\nmodule ActiveRecord/' ~/rails/activerecord/test/cases/adapters/postgresql/postgresql_adapter_test.rb || true
+          # --profile is only a valid option when railties' minitest plugin is
+          # active; it isn't here, so strip it (CI=true would otherwise set it).
+          sed -i 's/t.options = "--profile" if ENV\["CI"\]//g' ~/rails/activerecord/Rakefile
+
       - name: Fix Weird Test Cases
         run: |
           sed -i 's|} - \[:|} - \[:distinct_on, :uniq_on, :|' ~/rails/activerecord/test/cases/relation/delegation_test.rb
@@ -184,6 +195,16 @@ jobs:
           echo "gem 'ostruct'" >> ~/rails/Gemfile
           sed -i "s/# frozen_string_literal: true/# frozen_string_literal: true\nrequire 'ostruct'/" ~/rails/activerecord/test/cases/encryption/configurable_test.rb
           cat ~/rails/Gemfile
+
+      - name: This can eventually be removed
+        run: |
+          # minitest/mock isn't auto-required by the standalone AR suite; force it.
+          sed -i 's/gem "minitest"$/gem "minitest"\ngem "minitest-mock", require: "minitest\/mock"/' ~/rails/Gemfile
+          # dbconsole_test.rb references the Rails constant; stub an empty module.
+          sed -i 's/module ActiveRecord$/module Rails\nend\nmodule ActiveRecord/' ~/rails/activerecord/test/cases/adapters/sqlite3/dbconsole_test.rb || true
+          # --profile is only a valid option when railties' minitest plugin is
+          # active; it isn't here, so strip it (CI=true would otherwise set it).
+          sed -i 's/t.options = "--profile" if ENV\["CI"\]//g' ~/rails/activerecord/Rakefile
 
       - name: Fix Weird Test Cases
         run: |
@@ -253,6 +274,18 @@ jobs:
           echo "gem 'ostruct'" >> ~/rails/Gemfile
           sed -i "s/# frozen_string_literal: true/# frozen_string_literal: true\nrequire 'ostruct'/" ~/rails/activerecord/test/cases/encryption/configurable_test.rb
           cat ~/rails/Gemfile
+
+      - name: This can eventually be removed
+        run: |
+          # minitest/mock isn't auto-required by the standalone AR suite; force it.
+          sed -i 's/gem "minitest"$/gem "minitest"\ngem "minitest-mock", require: "minitest\/mock"/' ~/rails/Gemfile
+          # warnings_test.rb / mysql2_adapter_test.rb reference the Rails constant;
+          # Rails is undefined when the suite runs standalone, so stub an empty module.
+          sed -i 's/class WarningsTest < ActiveRecord::AbstractMysqlTestCase$/module Rails\nend\nclass WarningsTest < ActiveRecord::AbstractMysqlTestCase/' ~/rails/activerecord/test/cases/adapters/abstract_mysql_adapter/warnings_test.rb || true
+          sed -i 's/class Mysql2AdapterTest < ActiveRecord::Mysql2TestCase$/module Rails\nend\nclass Mysql2AdapterTest < ActiveRecord::Mysql2TestCase/' ~/rails/activerecord/test/cases/adapters/mysql2/mysql2_adapter_test.rb || true
+          # --profile is only a valid option when railties' minitest plugin is
+          # active; it isn't here, so strip it (CI=true would otherwise set it).
+          sed -i 's/t.options = "--profile" if ENV\["CI"\]//g' ~/rails/activerecord/Rakefile
 
       - name: Fix Weird Test Cases
         run: |
