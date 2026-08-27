@@ -236,13 +236,30 @@ jobs:
           - "8.1"
         ruby-version:
           - "3.4"
+        mysql-version:
+          - "8.4"
+    env:
+      MYSQL_HOST: 127.0.0.1
+      MYSQL_PORT: 3306
+    services:
+      mysql:
+        image: mysql:${{ matrix.mysql-version }}
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+          MYSQL_ROOT_HOST: "%"
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h127.0.0.1 -uroot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
 
     steps:
-      - name: Install MySQL
+      - name: Setup MySQL user
         run: |
-          sudo /etc/init.d/mysql start
-          mysql -uroot -proot -e "CREATE USER 'rails'@'%';"
-          mysql -uroot -proot -e "GRANT ALL PRIVILEGES ON *.* TO 'rails'@'%' WITH GRANT OPTION;"
+          mysql -h127.0.0.1 -P3306 -uroot -e "CREATE USER 'rails'@'%';"
+          mysql -h127.0.0.1 -P3306 -uroot -e "GRANT ALL PRIVILEGES ON *.* TO 'rails'@'%' WITH GRANT OPTION;"
 
       - uses: actions/checkout@v7
 
