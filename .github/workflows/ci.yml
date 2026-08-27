@@ -18,12 +18,12 @@ jobs:
       fail-fast: false
       matrix:
         rails-version:
-          - 8.0
-          - 8.1
+          - "8.0"
+          - "8.1"
         ruby-version:
-          - 3.3
-          - 3.4
-          - 4.0
+          - "3.3"
+          - "3.4"
+          - "4.0"
         postgres-version:
           - 18
 
@@ -71,10 +71,10 @@ jobs:
       fail-fast: false
       matrix:
         rails-version:
-          - 8.0
-          - 8.1
+          - "8.0"
+          - "8.1"
         ruby-version:
-          - 3.4
+          - "3.4"
         postgres-version:
           - 18
 
@@ -159,10 +159,10 @@ jobs:
       fail-fast: false
       matrix:
         rails-version:
-          - 8.0
-          - 8.1
+          - "8.0"
+          - "8.1"
         ruby-version:
-          - 3.4
+          - "3.4"
 
     steps:
       - uses: actions/checkout@v7
@@ -232,10 +232,10 @@ jobs:
       fail-fast: false
       matrix:
         rails-version:
-          - 8.0
-          - 8.1
+          - "8.0"
+          - "8.1"
         ruby-version:
-          - 3.4
+          - "3.4"
 
     steps:
       - name: Install MySQL
