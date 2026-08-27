@@ -1,4 +1,4 @@
-## [9.0.0] - Unreleased
+## [9.0.0] - 2026-08-27
 
 ### Changed
 - Switched to independent Semantic Versioning. Prior releases tracked the Rails

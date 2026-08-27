@@ -1,7 +1,7 @@
 require_relative "lib/arel/extensions/version"
 
 Gem::Specification.new do |gem|
-  gem.name = 'arel-extensions'
+  gem.name          = 'arel-extensions'
   gem.version       = Arel::Extensions::VERSION
   gem.authors       = ["Jon Bracy"]
   gem.email         = ["jonbracy@gmail.com"]
