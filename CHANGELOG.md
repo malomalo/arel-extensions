@@ -14,6 +14,8 @@
   the deprecated `test_files` declaration.
 
 ### Documentation
+- Documented the features arel-extensions adds (DISTINCT ON, NULLS ordering,
+  array/JSON predicates, full-text search, GIS, binary values) in the README.
 - Documented that the GIS predicates (`#intersects`, `#within`) require the
   optional `rgeo` gem unless passed an Arel node.
 
