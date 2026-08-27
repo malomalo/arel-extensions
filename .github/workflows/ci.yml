@@ -1,6 +1,14 @@
 name: CI
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   sunstone:
@@ -10,24 +18,23 @@ jobs:
       fail-fast: false
       matrix:
         rails-version:
-          - 7.1.6
-          - 7.2.3
-          - 8.0.4
-          - 8.1.1
+          - "8.0"
+          - "8.1"
         ruby-version:
-          - 3.3
-          - 3.4
-          - 4.0
+          - "3.3"
+          - "3.4"
+          - "4.0"
         postgres-version:
-          - 17
+          - 18
 
     steps:
       - name: Install Postgresql
         run: |
           sudo apt-get -y --purge remove $(sudo apt list --installed | grep postgresql | awk '{print $1}')
           sudo apt-get install curl ca-certificates gnupg
-          curl https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
-          sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+          sudo install -d /etc/apt/keyrings
+          curl https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo gpg --dearmor --yes -o /etc/apt/keyrings/pgdg.gpg
+          sudo sh -c 'echo "deb [signed-by=/etc/apt/keyrings/pgdg.gpg] http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
           sudo apt-get update
           sudo apt-get -y install libgeos-dev
           sudo apt-get -y install postgresql-${{ matrix.postgres-version }}-postgis-3
@@ -37,7 +44,7 @@ jobs:
           sudo -u postgres createuser runner --superuser
           sudo -u postgres psql -c "ALTER USER runner WITH PASSWORD 'runner';"
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: ruby/setup-ruby@v1
         with:
@@ -45,7 +52,8 @@ jobs:
           bundler-cache: false # runs 'bundle install' and caches installed gems automatically
 
       - run: |
-          sed -i -e "s/gem.add_dependency 'activerecord', '>= [[:digit:]]\+.[[:digit:]]\+.[[:digit:]]\+'/gem.add_dependency 'activerecord', '${{ matrix.rails-version }}'/" arel-extensions.gemspec
+          sed -i -e "s/gem.add_dependency 'activerecord', '>= [[:digit:]]\+.[[:digit:]]\+.[[:digit:]]\+'/gem.add_dependency 'activerecord', '~> ${{ matrix.rails-version }}.0'/" arel-extensions.gemspec
+          grep -q "~> ${{ matrix.rails-version }}.0" arel-extensions.gemspec || { echo "ERROR: gemspec activerecord pin not applied (anchor changed?)"; exit 1; }
           rm -f Gemfile.lock
           bundle install --jobs=3 --retry=3
 
@@ -63,25 +71,21 @@ jobs:
       fail-fast: false
       matrix:
         rails-version:
-          - 7.2.3
-          - 8.0.4
-          - 8.1.1
+          - "8.0"
+          - "8.1"
         ruby-version:
-          - 3.4
+          - "3.4"
         postgres-version:
-          - 17
-        include:
-          - rails-version: '7.1.6'
-            ruby-version: '3.3'
-            postgres-version: '17'
+          - 18
 
     steps:
       - name: Install Postgresql
         run: |
           sudo apt-get -y --purge remove $(sudo apt list --installed | grep postgresql | awk '{print $1}')
           sudo apt-get install curl ca-certificates gnupg
-          curl https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
-          sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+          sudo install -d /etc/apt/keyrings
+          curl https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo gpg --dearmor --yes -o /etc/apt/keyrings/pgdg.gpg
+          sudo sh -c 'echo "deb [signed-by=/etc/apt/keyrings/pgdg.gpg] http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
           sudo apt-get update
           sudo apt-get -y install postgresql-${{ matrix.postgres-version }}-postgis-3
           sudo systemctl start postgresql@${{ matrix.postgres-version }}-main.service
@@ -90,7 +94,7 @@ jobs:
           sudo -u postgres createuser runner --superuser
           sudo -u postgres psql -c "ALTER USER runner WITH PASSWORD 'runner';"
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: ruby/setup-ruby@v1
         with:
@@ -99,22 +103,37 @@ jobs:
 
       - name: Download Rails
         run: |
-          git clone --branch v${{ matrix.rails-version }} https://github.com/rails/rails.git ~/rails
+          series="${{ matrix.rails-version }}"
+          esc="${series//./\\.}"
+          RAILS_TAG=$(git ls-remote --tags --refs https://github.com/rails/rails.git "v${series}*" \
+            | sed 's,.*refs/tags/,,' \
+            | grep -E "^v${esc}(\.[0-9]+)+$" \
+            | sort -V | tail -1)
+          test -n "$RAILS_TAG" || { echo "No Rails release tag found for series ${series}"; exit 1; }
+          echo "Using latest Rails tag for ${series}: $RAILS_TAG"
+          git clone --branch "$RAILS_TAG" https://github.com/rails/rails.git ~/rails
           pushd ~/rails
           cat /home/runner/work/_temp/*.sh
           sed -i "s/Gem.ruby, '-w'/Gem.ruby, '-w0'/" ~/rails/activerecord/Rakefile
           sed -i "s/t.warning = true/t.warning = false/g" ~/rails/activerecord/Rakefile
           sed -i "/require \"active_record\"/a \$LOAD_PATH.unshift\(File.expand_path\(ENV['GITHUB_WORKSPACE']\)\)\nrequire 'arel/extensions'" ~/rails/activerecord/test/cases/helper.rb
+          grep -q "require 'arel/extensions'" ~/rails/activerecord/test/cases/helper.rb || { echo "ERROR: failed to inject require arel/extensions into helper.rb (anchor changed upstream?)"; exit 1; }
           rm ~/rails/Gemfile.lock
           sed -i "/# Active Record./a gem 'arel-extensions', require: 'arel/extensions', path: File.expand_path\(ENV['GITHUB_WORKSPACE']\)" ~/rails/Gemfile
+          grep -q "arel-extensions" ~/rails/Gemfile || { echo "ERROR: failed to inject arel-extensions into Gemfile (anchor changed upstream?)"; exit 1; }
           echo "gem 'ostruct'" >> ~/rails/Gemfile
           sed -i "s/# frozen_string_literal: true/# frozen_string_literal: true\nrequire 'ostruct'/" ~/rails/activerecord/test/cases/encryption/configurable_test.rb
           cat ~/rails/Gemfile
 
       - name: This can eventually be removed
         run: |
+          # minitest/mock isn't auto-required by the standalone AR suite; force it.
           sed -i 's/gem "minitest"$/gem "minitest"\ngem "minitest-mock", require: "minitest\/mock"/' ~/rails/Gemfile
+          # postgresql_adapter_test.rb calls Rails.define_singleton_method(:error);
+          # Rails is undefined when the suite runs standalone, so stub an empty module.
           sed -i 's/module ActiveRecord$/module Rails\nend\nmodule ActiveRecord/' ~/rails/activerecord/test/cases/adapters/postgresql/postgresql_adapter_test.rb || true
+          # --profile is only a valid option when railties' minitest plugin is
+          # active; it isn't here, so strip it (CI=true would otherwise set it).
           sed -i 's/t.options = "--profile" if ENV\["CI"\]//g' ~/rails/activerecord/Rakefile
 
       - name: Fix Weird Test Cases
@@ -126,12 +145,12 @@ jobs:
           pushd ~/rails
           bundle update --jobs=3 --retry=3
           popd
-          
+
       - run: |
           pushd ~/rails/activerecord
           bundle exec rake db:postgresql:rebuild postgresql:test --trace
           bundle exec rake db:postgresql:rebuild postgresql:isolated_test --trace
-          
+
   ar-sqlite:
     name: ActiveRecord SQLite Test
     runs-on: ubuntu-24.04
@@ -140,17 +159,13 @@ jobs:
       fail-fast: false
       matrix:
         rails-version:
-          - 7.2.3
-          - 8.0.4
-          - 8.1.1
+          - "8.0"
+          - "8.1"
         ruby-version:
-          - 3.4
-        include:
-          - rails-version: '7.1.6'
-            ruby-version: '3.3'
+          - "3.4"
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: ruby/setup-ruby@v1
         with:
@@ -159,26 +174,37 @@ jobs:
 
       - name: Download Rails
         run: |
-          git clone --branch v${{ matrix.rails-version }} https://github.com/rails/rails.git ~/rails
+          series="${{ matrix.rails-version }}"
+          esc="${series//./\\.}"
+          RAILS_TAG=$(git ls-remote --tags --refs https://github.com/rails/rails.git "v${series}*" \
+            | sed 's,.*refs/tags/,,' \
+            | grep -E "^v${esc}(\.[0-9]+)+$" \
+            | sort -V | tail -1)
+          test -n "$RAILS_TAG" || { echo "No Rails release tag found for series ${series}"; exit 1; }
+          echo "Using latest Rails tag for ${series}: $RAILS_TAG"
+          git clone --branch "$RAILS_TAG" https://github.com/rails/rails.git ~/rails
           pushd ~/rails
           cat /home/runner/work/_temp/*.sh
           sed -i "s/Gem.ruby, '-w'/Gem.ruby, '-w0'/" ~/rails/activerecord/Rakefile
           sed -i "s/t.warning = true/t.warning = false/g" ~/rails/activerecord/Rakefile
           sed -i "/require \"active_record\"/a \$LOAD_PATH.unshift\(File.expand_path\(ENV['GITHUB_WORKSPACE']\)\)\nrequire 'arel/extensions'" ~/rails/activerecord/test/cases/helper.rb
+          grep -q "require 'arel/extensions'" ~/rails/activerecord/test/cases/helper.rb || { echo "ERROR: failed to inject require arel/extensions into helper.rb (anchor changed upstream?)"; exit 1; }
           rm ~/rails/Gemfile.lock
           sed -i "/# Active Record./a gem 'arel-extensions', require: 'arel/extensions', path: File.expand_path\(ENV['GITHUB_WORKSPACE']\)" ~/rails/Gemfile
+          grep -q "arel-extensions" ~/rails/Gemfile || { echo "ERROR: failed to inject arel-extensions into Gemfile (anchor changed upstream?)"; exit 1; }
           echo "gem 'ostruct'" >> ~/rails/Gemfile
           sed -i "s/# frozen_string_literal: true/# frozen_string_literal: true\nrequire 'ostruct'/" ~/rails/activerecord/test/cases/encryption/configurable_test.rb
           cat ~/rails/Gemfile
 
       - name: This can eventually be removed
         run: |
+          # minitest/mock isn't auto-required by the standalone AR suite; force it.
           sed -i 's/gem "minitest"$/gem "minitest"\ngem "minitest-mock", require: "minitest\/mock"/' ~/rails/Gemfile
-          cat ~/rails/Gemfile
-          sed -i 's/module ActiveRecord$/module Rails\nend\nmodule ActiveRecord/' ~/rails/activerecord/test/cases/adapters/sqlite3/dbconsole_test.rb
-          cat  ~/rails/activerecord/test/cases/adapters/sqlite3/dbconsole_test.rb
+          # dbconsole_test.rb references the Rails constant; stub an empty module.
+          sed -i 's/module ActiveRecord$/module Rails\nend\nmodule ActiveRecord/' ~/rails/activerecord/test/cases/adapters/sqlite3/dbconsole_test.rb || true
+          # --profile is only a valid option when railties' minitest plugin is
+          # active; it isn't here, so strip it (CI=true would otherwise set it).
           sed -i 's/t.options = "--profile" if ENV\["CI"\]//g' ~/rails/activerecord/Rakefile
-          cat ~/rails/activerecord/Rakefile
 
       - name: Fix Weird Test Cases
         run: |
@@ -197,7 +223,7 @@ jobs:
           bundle exec rake sqlite3:isolated_test --trace
           rm test/db/*.sqlite3 test/fixtures/*.sqlite3
           bundle exec rake sqlite3_mem:test --trace
-        
+
   ar-mysql:
     name: ActiveRecord MySQL Test
     runs-on: ubuntu-24.04
@@ -206,23 +232,36 @@ jobs:
       fail-fast: false
       matrix:
         rails-version:
-          - 7.2.3
-          - 8.0.4
-          - 8.1.1
+          - "8.0"
+          - "8.1"
         ruby-version:
-          - 3.4
-        include:
-          - rails-version: '7.1.6'
-            ruby-version: '3.3'
+          - "3.4"
+        mysql-version:
+          - "8.4"
+    env:
+      MYSQL_HOST: 127.0.0.1
+      MYSQL_PORT: 3306
+    services:
+      mysql:
+        image: mysql:${{ matrix.mysql-version }}
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+          MYSQL_ROOT_HOST: "%"
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h127.0.0.1 -uroot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
 
     steps:
-      - name: Install MySQL
+      - name: Setup MySQL user
         run: |
-          sudo /etc/init.d/mysql start
-          mysql -uroot -proot -e "CREATE USER 'rails'@'%';"
-          mysql -uroot -proot -e "GRANT ALL PRIVILEGES ON *.* TO 'rails'@'%' WITH GRANT OPTION;"
+          mysql -h127.0.0.1 -P3306 -uroot -e "CREATE USER 'rails'@'%';"
+          mysql -h127.0.0.1 -P3306 -uroot -e "GRANT ALL PRIVILEGES ON *.* TO 'rails'@'%' WITH GRANT OPTION;"
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: ruby/setup-ruby@v1
         with:
@@ -231,25 +270,39 @@ jobs:
 
       - name: Download Rails
         run: |
-          git clone --branch v${{ matrix.rails-version }} https://github.com/rails/rails.git ~/rails
+          series="${{ matrix.rails-version }}"
+          esc="${series//./\\.}"
+          RAILS_TAG=$(git ls-remote --tags --refs https://github.com/rails/rails.git "v${series}*" \
+            | sed 's,.*refs/tags/,,' \
+            | grep -E "^v${esc}(\.[0-9]+)+$" \
+            | sort -V | tail -1)
+          test -n "$RAILS_TAG" || { echo "No Rails release tag found for series ${series}"; exit 1; }
+          echo "Using latest Rails tag for ${series}: $RAILS_TAG"
+          git clone --branch "$RAILS_TAG" https://github.com/rails/rails.git ~/rails
           pushd ~/rails
           cat /home/runner/work/_temp/*.sh
           sed -i "s/Gem.ruby, '-w'/Gem.ruby, '-w0'/" ~/rails/activerecord/Rakefile
           sed -i "s/t.warning = true/t.warning = false/g" ~/rails/activerecord/Rakefile
           sed -i "/require \"active_record\"/a \$LOAD_PATH.unshift\(File.expand_path\(ENV['GITHUB_WORKSPACE']\)\)\nrequire 'arel/extensions'" ~/rails/activerecord/test/cases/helper.rb
+          grep -q "require 'arel/extensions'" ~/rails/activerecord/test/cases/helper.rb || { echo "ERROR: failed to inject require arel/extensions into helper.rb (anchor changed upstream?)"; exit 1; }
           rm ~/rails/Gemfile.lock
           sed -i "/# Active Record./a gem 'arel-extensions', require: 'arel/extensions', path: File.expand_path\(ENV['GITHUB_WORKSPACE']\)" ~/rails/Gemfile
+          grep -q "arel-extensions" ~/rails/Gemfile || { echo "ERROR: failed to inject arel-extensions into Gemfile (anchor changed upstream?)"; exit 1; }
           echo "gem 'ostruct'" >> ~/rails/Gemfile
           sed -i "s/# frozen_string_literal: true/# frozen_string_literal: true\nrequire 'ostruct'/" ~/rails/activerecord/test/cases/encryption/configurable_test.rb
           cat ~/rails/Gemfile
 
       - name: This can eventually be removed
         run: |
+          # minitest/mock isn't auto-required by the standalone AR suite; force it.
           sed -i 's/gem "minitest"$/gem "minitest"\ngem "minitest-mock", require: "minitest\/mock"/' ~/rails/Gemfile
+          # warnings_test.rb / mysql2_adapter_test.rb reference the Rails constant;
+          # Rails is undefined when the suite runs standalone, so stub an empty module.
           sed -i 's/class WarningsTest < ActiveRecord::AbstractMysqlTestCase$/module Rails\nend\nclass WarningsTest < ActiveRecord::AbstractMysqlTestCase/' ~/rails/activerecord/test/cases/adapters/abstract_mysql_adapter/warnings_test.rb || true
           sed -i 's/class Mysql2AdapterTest < ActiveRecord::Mysql2TestCase$/module Rails\nend\nclass Mysql2AdapterTest < ActiveRecord::Mysql2TestCase/' ~/rails/activerecord/test/cases/adapters/mysql2/mysql2_adapter_test.rb || true
+          # --profile is only a valid option when railties' minitest plugin is
+          # active; it isn't here, so strip it (CI=true would otherwise set it).
           sed -i 's/t.options = "--profile" if ENV\["CI"\]//g' ~/rails/activerecord/Rakefile
-          cat ~/rails/activerecord/Rakefile
 
       - name: Fix Weird Test Cases
         run: |

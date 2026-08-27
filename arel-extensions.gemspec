@@ -1,4 +1,4 @@
-require File.expand_path("../lib/arel/extensions/version", __FILE__)
+require_relative "lib/arel/extensions/version"
 
 Gem::Specification.new do |gem|
   gem.name = 'arel-extensions'
@@ -6,16 +6,23 @@ Gem::Specification.new do |gem|
   gem.authors       = ["Jon Bracy"]
   gem.email         = ["jonbracy@gmail.com"]
   gem.summary       = %q{Adds support for missing SQL operators and functions to Arel}
+  gem.description   = %q{Extends Arel and ActiveRecord with SQL operators and functions that aren't available out of the box, including array and JSON predicates, PostgreSQL full-text search (tsvector/tsquery), GIS/geometry predicates, and additional ordering helpers.}
   gem.homepage      = 'https://github.com/malomalo/arel-extensions'
   gem.licenses      = ['MIT']
 
-  gem.files         = `git ls-files`.split("\n")
-  gem.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
+  gem.metadata = {
+    "source_code_uri"       => gem.homepage,
+    "changelog_uri"         => "#{gem.homepage}/blob/master/CHANGELOG.md",
+    "rubygems_mfa_required" => "true",
+  }
+
+  gem.required_ruby_version = '>= 3.3'
+
+  gem.files         = `git ls-files -- lib ext CHANGELOG.md LICENSE README.md`.split("\n")
   gem.require_paths = ["lib"]
 
-  gem.add_dependency 'activerecord', '>= 7.0.0', '< 9.0'
+  gem.add_dependency 'activerecord', '>= 8.0.0', '< 9.0'
 
-  gem.add_development_dependency "bundler"
   gem.add_development_dependency "debug"
   gem.add_development_dependency "rake"
   gem.add_development_dependency 'minitest'
