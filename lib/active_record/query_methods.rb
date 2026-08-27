@@ -46,4 +46,4 @@ end
 
 ActiveRecord::QueryMethods.prepend(ActiveRecord::DistinctOn)
 ActiveRecord::Querying.delegate :distinct_on, to: :all
-ActiveRecord::Querying.delegate :distinct_on!, to: :all
+ActiveRecord::Querying.delegate :uniq_on, to: :all
