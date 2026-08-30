@@ -39,19 +39,25 @@ module Arel
         collector
       end
 
+      # Quote a JSON path key so it can't break out of the #>'{...}' literal.
+      def escape_json_path_segment(name)
+        elem = name.to_s.gsub(/["\\]/) { |c| "\\#{c}" }
+        ('"' + elem + '"').gsub("'", "''")
+      end
+
       def visit_Arel_Attributes_Key(o, collector, last_key = true)
         if o.relation.is_a?(Arel::Attributes::Key)
           visit_Arel_Attributes_Key(o.relation, collector, false)
           if last_key
-            collector << o.name.to_s
+            collector << escape_json_path_segment(o.name)
             collector << "}'"
           else
-            collector << o.name.to_s
+            collector << escape_json_path_segment(o.name)
             collector << ","
           end
         else
           visit(o.relation, collector)
-          collector << "\#>'{" << o.name.to_s
+          collector << "\#>'{" << escape_json_path_segment(o.name)
           collector << (last_key ? "}'" : ",")
         end
         collector
