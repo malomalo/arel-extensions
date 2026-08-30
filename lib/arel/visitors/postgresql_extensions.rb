@@ -39,30 +39,24 @@ module Arel
         collector
       end
 
-      # Quote a JSON path key so it can't break out of the #>'{...}' literal.
-      def escape_json_path_segment(name)
-        elem = name.to_s.gsub(/["\\]/) { |c| "\\#{c}" }
-        ('"' + elem + '"').gsub("'", "''")
-      end
-
-      def visit_Arel_Attributes_Key(o, collector, last_key = true)
-        if o.relation.is_a?(Arel::Attributes::Key)
-          visit_Arel_Attributes_Key(o.relation, collector, false)
-          if last_key
-            collector << escape_json_path_segment(o.name)
-            collector << "}'"
-          else
-            collector << escape_json_path_segment(o.name)
-            collector << ","
-          end
-        else
-          visit(o.relation, collector)
-          collector << "\#>'{" << escape_json_path_segment(o.name)
-          collector << (last_key ? "}'" : ",")
+      # Path segments are emitted as a quoted `array[...]` rather than
+      # interpolated into a `'{...}'` array literal, so a segment can never
+      # break out of the path and inject SQL (GHSA-75hc-9q9v-9cv2). PostgreSQL
+      # const-folds the array back to `'{a,b}'::text[]`, so expression indexes
+      # on the literal form still match.
+      def visit_Arel_Attributes_Key(o, collector)
+        keys = []
+        node = o
+        while node.is_a?(Arel::Attributes::Key)
+          keys.unshift(quote(node.name.to_s))
+          node = node.relation
         end
+
+        visit(node, collector)
+        collector << " #> array[" << keys.join(',') << "]"
         collector
       end
-
+      
       def visit_Arel_Nodes_HasKey(o, collector)
         right = o.right
 
@@ -90,10 +84,23 @@ module Arel
         collector
       end
 
+      # A type name can't be bound or quoted, so only allow something that
+      # actually looks like one -- optionally schema qualified, with a modifier
+      # and/or array suffix. Keeps user input from reaching the SQL as-is.
+      CAST_TYPE = /\A
+        [a-z_][a-z0-9_]*(\.[a-z_][a-z0-9_]*)?  # type, optionally schema qualified
+        (\ [a-z]+)*                            # "timestamp with time zone"
+        (\(\d+(\s*,\s*\d+)?\))?                # "varchar(255)", "numeric(10,2)"
+        (\[\])*                                # "int[]"
+      \z/x
+      
       def visit_Arel_Attributes_Cast(o, collector)
+        type = o.name.to_s
+        raise ArgumentError, "invalid cast type: #{type.inspect}" unless CAST_TYPE.match?(type)
+
         collector << "("
         visit(o.relation, collector)
-        collector << ")::#{o.name}"
+        collector << ")::#{type}"
         collector
       end
 

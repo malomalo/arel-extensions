@@ -188,7 +188,15 @@ class ActiveSupport::TestCase
   end
 
   def assert_sql(expected, query)
-    assert_equal expected.strip, query.to_sql.strip.gsub(/\s+/, ' ')
+    query = if query.respond_to?(:to_sql)
+      query.to_sql 
+    elsif [Arel::Nodes::Node, Arel::Attributes::Attribute].any? { |k| query.is_a?(k) }
+      ActiveRecord::Base.lease_connection.visitor.compile(query)
+    else
+      query
+    end
+
+    assert_equal expected.strip.gsub(/( +|\n)/, ' '), query.strip.gsub(/( +|\n)/, ' ')
   end
   # test/unit backwards compatibility methods
   alias :assert_raise :assert_raises
