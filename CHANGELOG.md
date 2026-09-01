@@ -14,6 +14,11 @@
   looks like a type identifier. Not reachable from activerecord-filter, but it
   was the same class of raw interpolation.
 
+### Changed
+- A path segment is now always a single segment: `key('a,b')` emits
+  `array['a,b']`, where the old raw `'{a,b}'` literal let PostgreSQL split it
+  on the comma into two segments. Use `dig('a', 'b')` for multi-segment paths.
+
 [GHSA-75hc-9q9v-9cv2]: https://github.com/malomalo/arel-extensions/security/advisories/GHSA-75hc-9q9v-9cv2
 
 ## [9.0.0] - 2026-08-27

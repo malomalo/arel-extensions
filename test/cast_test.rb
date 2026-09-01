@@ -15,9 +15,12 @@ class CastTest < ActiveSupport::TestCase
   test 'cast_as accepts qualified, modified and array types' do
     [
       'text',
+      'INTEGER',
       'varchar(255)',
       'numeric(10,2)',
       'timestamp with time zone',
+      'timestamp(6) with time zone',
+      'character varying(255)',
       'int[]',
       'public.geometry'
     ].each do |type|

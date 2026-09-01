@@ -98,8 +98,8 @@ data.dig('age').cast_as('int')                  # (data #> array['age'])::int
 
 A type name can't be quoted or bound, so `cast_as` accepts only something that
 looks like one; optionally schema qualified, with a modifier. For example:
-`text`, `varchar(255)`, `numeric(10,2)`, `timestamp with time zone`, `int[]`,
-`public.geometry`. A `ArgumentError` will be raised otherwise.
+`text`, `varchar(255)`, `numeric(10,2)`, `timestamp(6) with time zone`,
+`int[]`, `public.geometry`. An `ArgumentError` will be raised otherwise.
 
 ### Full-text search
 

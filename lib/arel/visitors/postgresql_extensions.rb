@@ -89,10 +89,11 @@ module Arel
       # and/or array suffix. Keeps user input from reaching the SQL as-is.
       CAST_TYPE = /\A
         [a-z_][a-z0-9_]*(\.[a-z_][a-z0-9_]*)?  # type, optionally schema qualified
-        (\ [a-z]+)*                            # "timestamp with time zone"
         (\(\d+(\s*,\s*\d+)?\))?                # "varchar(255)", "numeric(10,2)"
+        (\ [a-z]+)*                            # "timestamp with time zone"
+        (\(\d+(\s*,\s*\d+)?\))?                # "character varying(255)"
         (\[\])*                                # "int[]"
-      \z/x
+      \z/xi
       
       def visit_Arel_Attributes_Cast(o, collector)
         type = o.name.to_s

@@ -75,13 +75,13 @@ class JSONTest < ActiveSupport::TestCase
     Property.create!(name: 'public', metadata: { 'key' => 'v' })
     Property.create!(name: 'secret', metadata: { 'other' => 'z' })
     
-    %w(} ]).each do |delemitier|
-      payload = "key'#{delemitier} IS NOT NULL OR 1=1 --"
+    %w(} ]).each do |delimiter|
+      payload = "key'#{delimiter} IS NOT NULL OR 1=1 --"
       query   = Property.where(metadata.dig(payload).not_eq(nil))
   
       assert_sql(<<~SQL, query)
         SELECT "properties".* FROM "properties"
-        WHERE "properties"."metadata" #> array['key''#{delemitier} IS NOT NULL OR 1=1 --'] IS NOT NULL
+        WHERE "properties"."metadata" #> array['key''#{delimiter} IS NOT NULL OR 1=1 --'] IS NOT NULL
       SQL
   
       # No row has the (nonsense) key, so nothing may come back. Before the fix
