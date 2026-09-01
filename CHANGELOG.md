@@ -1,3 +1,26 @@
+## [9.0.1] - 2026-08-30
+
+### Security
+- Fixed a SQL injection in the PostgreSQL visitor's JSON path handling
+  ([GHSA-75hc-9q9v-9cv2], CWE-89, high). `key`/`dig` path segments were
+  interpolated straight into a `#>'{...}'` array literal, so a segment
+  containing `}'` could close the literal and have the rest of it executed as
+  SQL. Most reachable through activerecord-filter, where a filter key like
+  `"metadata.<payload>"` on a json/jsonb column puts request input into `dig`.
+  Segments are now emitted as a quoted `#> array[...]`, which PostgreSQL folds
+  back to the same `text[]` constant (existing expression indexes still match).
+  Reported by [@saidM](https://github.com/saidM).
+- `cast_as` now validates the type name and raises `ArgumentError` unless it
+  looks like a type identifier. Not reachable from activerecord-filter, but it
+  was the same class of raw interpolation.
+
+### Changed
+- A path segment is now always a single segment: `key('a,b')` emits
+  `array['a,b']`, where the old raw `'{a,b}'` literal let PostgreSQL split it
+  on the comma into two segments. Use `dig('a', 'b')` for multi-segment paths.
+
+[GHSA-75hc-9q9v-9cv2]: https://github.com/malomalo/arel-extensions/security/advisories/GHSA-75hc-9q9v-9cv2
+
 ## [9.0.0] - 2026-08-27
 
 ### Changed
