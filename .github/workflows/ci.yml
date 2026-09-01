@@ -39,7 +39,13 @@ jobs:
           sudo apt-get -y install libgeos-dev
           sudo apt-get -y install postgresql-${{ matrix.postgres-version }}-postgis-3
           sudo systemctl start postgresql@${{ matrix.postgres-version }}-main.service
+          # The AR suite can exceed the default 100 connection slots depending on
+          # the minitest seed (pool/isolated cases in flight), which cascades into
+          # hundreds of "too many clients already" errors. Give it headroom.
+          sudo -u postgres psql -c "ALTER SYSTEM SET max_connections = 500;"
+          sudo systemctl restart postgresql@${{ matrix.postgres-version }}-main.service
           sudo systemctl status postgresql@${{ matrix.postgres-version }}-main.service
+          sudo -u postgres psql -c "SHOW max_connections;"
           sudo pg_lsclusters
           sudo -u postgres createuser runner --superuser
           sudo -u postgres psql -c "ALTER USER runner WITH PASSWORD 'runner';"
@@ -89,7 +95,13 @@ jobs:
           sudo apt-get update
           sudo apt-get -y install postgresql-${{ matrix.postgres-version }}-postgis-3
           sudo systemctl start postgresql@${{ matrix.postgres-version }}-main.service
+          # The AR suite can exceed the default 100 connection slots depending on
+          # the minitest seed (pool/isolated cases in flight), which cascades into
+          # hundreds of "too many clients already" errors. Give it headroom.
+          sudo -u postgres psql -c "ALTER SYSTEM SET max_connections = 500;"
+          sudo systemctl restart postgresql@${{ matrix.postgres-version }}-main.service
           sudo systemctl status postgresql@${{ matrix.postgres-version }}-main.service
+          sudo -u postgres psql -c "SHOW max_connections;"
           sudo pg_lsclusters
           sudo -u postgres createuser runner --superuser
           sudo -u postgres psql -c "ALTER USER runner WITH PASSWORD 'runner';"
