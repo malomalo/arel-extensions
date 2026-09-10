@@ -58,6 +58,24 @@ tags.contained_by(other)   # tags <@ other
 tags.excludes(other)       # NOT (tags @> other)
 ```
 
+### Range columns
+
+ActiveRecord types `tsrange`/`tstzrange`/`daterange`/`int4range`/`int8range`/
+`numrange` columns as `OID::Range`, so a plain Ruby Range serializes to a
+PostgreSQL range literal — no special node needed:
+
+```ruby
+period = Property.arel_table[:period]
+
+period.contains(t1...t2)      # "period" @> '[2026-01-01 00:00:00,2026-12-31 00:00:00)'
+period.overlaps(t1...t2)      # "period" && '[...)'
+period.contained_by(t1...t2)  # "period" <@ '[...)'
+```
+
+`..` gives an inclusive upper bound (`']'`), `...` an exclusive one (`')'`), and
+a `nil` end is unbounded. PostgreSQL's exclusive *lower* bounds (`'('`) have no
+Ruby Range equivalent; build the range with a `NamedFunction` if you need one.
+
 ### JSON / JSONB predicates
 
 ```ruby
