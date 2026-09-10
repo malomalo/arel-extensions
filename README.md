@@ -56,6 +56,7 @@ A `RANDOM()` ordering node is also provided.
 tags = Post.arel_table[:tags]
 tags.contained_by(other)   # tags <@ other
 tags.excludes(other)       # NOT (tags @> other)
+tags.not_overlaps(other)   # NOT (tags && other)
 ```
 
 ### Range columns
