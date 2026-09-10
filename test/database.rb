@@ -23,6 +23,8 @@ ActiveRecord::Migration.suppress_messages do
       t.string   "name",                 limit: 255
       t.tsvector 'vector_col'
       t.jsonb     'metadata'
+      t.tsrange   'period'
+      t.daterange 'season'
     end
 
   end

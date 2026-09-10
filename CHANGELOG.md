@@ -1,3 +1,14 @@
+## Unreleased
+
+### Fixed
+- `contained_by` now accepts a Ruby Range, so range columns work with all three
+  range predicates. It was the only one that did not quote its operand — a
+  deliberate choice for JSON and ARRAY, whose callers pre-wrap the value — which
+  meant `period.contained_by(t1...t2)` raised `TypeError: Cannot visit Range`
+  while `contains` and `overlaps` (from Arel core, which quotes through the
+  attribute) worked. Only Ruby Ranges are quoted; every other operand is passed
+  through untouched as before.
+
 ## [9.0.1] - 2026-08-30
 
 ### Security
