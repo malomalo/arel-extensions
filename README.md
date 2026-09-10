@@ -77,6 +77,22 @@ period.contained_by(t1...t2)  # "period" <@ '[...)'
 a `nil` end is unbounded. PostgreSQL's exclusive *lower* bounds (`'('`) have no
 Ruby Range equivalent; build the range with a `NamedFunction` if you need one.
 
+Beyond containment and overlap, PostgreSQL's positional operators ask where two
+ranges sit relative to one another:
+
+```ruby
+period.strictly_left_of(other)     # period << other
+period.strictly_right_of(other)    # period >> other
+period.not_extend_right_of(other)  # period &< other
+period.not_extend_left_of(other)   # period &> other
+period.adjacent_to(other)          # period -|- other
+```
+
+`<<` and `>>` mean every element is lower (or higher) with no overlap. `&<` asks
+whether the left range stops at or before the right one's upper bound, and `&>`
+whether it starts at or after the right one's lower bound. `-|-` is true when the
+two abut — touching, with no gap and no overlap.
+
 ### JSON / JSONB predicates
 
 ```ruby
