@@ -8,20 +8,20 @@ class NotOverlapsTest < ActiveSupport::TestCase
   test 'negates overlaps on an array column' do
     query = Property.arel_table['tags'].not_overlaps(['a', 'b'])
 
-    assert_equal(
-      %{NOT ("properties"."tags" && '{a,b}')},
-      query.to_sql
-    )
+    assert_sql(<<~SQL, query)
+      NOT ("properties"."tags" && '{a,b}')
+    SQL
+
     Property.where(query).first
   end
 
   test 'negates overlaps on a range column' do
     query = Property.arel_table['period'].not_overlaps(Time.utc(2026, 1, 1)...Time.utc(2026, 12, 31))
 
-    assert_equal(
-      %{NOT ("properties"."period" && '[2026-01-01 00:00:00,2026-12-31 00:00:00)')},
-      query.to_sql
-    )
+    assert_sql(<<~SQL, query)
+      NOT ("properties"."period" && '[2026-01-01 00:00:00,2026-12-31 00:00:00)')
+    SQL
+
     Property.where(query).first
   end
 
@@ -35,10 +35,7 @@ class NotOverlapsTest < ActiveSupport::TestCase
     attribute = Property.arel_table['period']
     range = Time.utc(2026, 1, 1)...Time.utc(2026, 12, 31)
 
-    assert_equal(
-      "NOT (#{attribute.overlaps(range).to_sql})",
-      attribute.not_overlaps(range).to_sql
-    )
+    assert_sql("NOT (#{attribute.overlaps(range).to_sql})", attribute.not_overlaps(range))
   end
 
 end
