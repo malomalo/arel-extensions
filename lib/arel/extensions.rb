@@ -9,9 +9,17 @@ require_relative "./nodes/intersects"
 require_relative "./nodes/within"
 require_relative "./nodes/excludes"
 require_relative "./nodes/contained_by"
+require_relative "./nodes/strictly_left_of"
+require_relative "./nodes/strictly_right_of"
+require_relative "./nodes/not_extend_right_of"
+require_relative "./nodes/not_extend_left_of"
+require_relative "./nodes/adjacent_to"
 
 require File.expand_path('../array_predications', __FILE__)
 Arel::Attributes::Attribute.include(Arel::ArrayPredications)
+
+require File.expand_path('../range_predications', __FILE__)
+Arel::Attributes::Attribute.include(Arel::RangePredications)
 
 require File.expand_path('../nodes/random', __FILE__)
 require File.expand_path(File.join(__FILE__, '../../../ext/arel/nodes/ascending'))
