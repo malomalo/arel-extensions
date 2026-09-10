@@ -9,7 +9,6 @@ require_relative "./nodes/intersects"
 require_relative "./nodes/within"
 require_relative "./nodes/excludes"
 require_relative "./nodes/contained_by"
-require_relative "./nodes/not_overlaps"
 
 require File.expand_path('../array_predications', __FILE__)
 Arel::Attributes::Attribute.include(Arel::ArrayPredications)

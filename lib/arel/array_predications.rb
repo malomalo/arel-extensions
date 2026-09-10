@@ -20,11 +20,11 @@ module Arel
       Arel::Nodes::Excludes.new(self, value)
     end
 
-    # The negation of Arel core's `overlaps`, and quoted the same way it is, so
-    # a Ruby Range or a bare value works and an already-built node passes
-    # through untouched.
+    # PostgreSQL has no `!&&`, so this is Arel's own Not wrapped around core's
+    # `overlaps` — which also means the operand is quoted exactly as `overlaps`
+    # quotes it.
     def not_overlaps(value)
-      Arel::Nodes::NotOverlaps.new(self, Arel::Nodes.build_quoted(value, self))
+      Arel::Nodes::Not.new(overlaps(value))
     end
 
   end

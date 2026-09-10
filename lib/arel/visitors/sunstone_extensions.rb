@@ -114,10 +114,18 @@ module Arel
         end
       end
 
-      def visit_Arel_Nodes_NotOverlaps o, collector
-        key = visit(o.left, collector)
-        value = { not_overlaps: visit(o.right, collector) }
-        
+      # `not_overlaps` builds Arel's own Not around an Overlaps rather than a
+      # bespoke node, so the negation is unwrapped here.
+      def visit_Arel_Nodes_Not o, collector
+        expr = o.expr
+
+        unless expr.is_a?(Arel::Nodes::Overlaps)
+          raise "Not Supported: NOT of #{expr.class}"
+        end
+
+        key = visit(expr.left, collector)
+        value = { not_overlaps: visit(expr.right, collector) }
+
         if key.is_a?(Hash)
           add_to_bottom_of_hash_or_array(key, value)
           key

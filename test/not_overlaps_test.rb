@@ -1,8 +1,7 @@
 require 'test_helper'
 
-# `not_overlaps` is the negation of Arel core's `overlaps`. PostgreSQL has no
-# `!&&` operator, so it renders as `NOT (left && right)` — the same shape as
-# `excludes`, which negates `@>`.
+# `not_overlaps` is Arel's own Not wrapped around core's `overlaps`, since
+# PostgreSQL has no `!&&` operator.
 class NotOverlapsTest < ActiveSupport::TestCase
 
   test 'negates overlaps on an array column' do
@@ -28,7 +27,7 @@ class NotOverlapsTest < ActiveSupport::TestCase
   test 'an already-built node passes through untouched' do
     casted = Arel::Nodes::Casted.new(['a'], Property.arel_table['tags'])
 
-    assert_same casted, Property.arel_table['tags'].not_overlaps(casted).right
+    assert_same casted, Property.arel_table['tags'].not_overlaps(casted).expr.right
   end
 
   test 'it is the negation of overlaps' do

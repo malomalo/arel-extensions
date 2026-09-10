@@ -39,15 +39,6 @@ module Arel
         collector
       end
 
-      def visit_Arel_Nodes_NotOverlaps o, collector
-        collector << 'NOT ('
-        visit o.left, collector
-        collector << ' && '
-        visit o.right, collector
-        collector << ')'
-        collector
-      end
-
       # Path segments are emitted as a quoted `array[...]` rather than
       # interpolated into a `'{...}'` array literal, so a segment can never
       # break out of the path and inject SQL (GHSA-75hc-9q9v-9cv2). PostgreSQL
