@@ -1,5 +1,18 @@
 ## Unreleased
 
+### Added
+- `not_overlaps` on attributes, the negation of Arel core’s `overlaps`. The
+  Sunstone visitor already emitted a not_overlaps key but there was no way to
+  build the node it visited, so `attribute.not_overlaps(value)` raised
+  `NoMethodError`. PostgreSQL has no `!&&` operator, so it is Arel’s own `Not`
+  wrapped around `overlaps`, which also means the operand is quoted exactly as
+  `overlaps` quotes it.
+
+### Changed
+- The Sunstone visitor handles `Arel::Nodes::Not` in place of the
+  `Arel::Nodes::NotOverlaps` it used to name. The serialized form is unchanged;
+  the node it unwraps is not.
+
 ### Fixed
 - `contained_by` now accepts a Ruby Range, so range columns work with all three
   range predicates. It was the only one that did not quote its operand — a

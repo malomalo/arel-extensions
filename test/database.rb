@@ -25,6 +25,7 @@ ActiveRecord::Migration.suppress_messages do
       t.jsonb     'metadata'
       t.tsrange   'period'
       t.daterange 'season'
+      t.string    'tags', array: true
     end
 
   end

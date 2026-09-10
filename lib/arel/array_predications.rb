@@ -20,5 +20,12 @@ module Arel
       Arel::Nodes::Excludes.new(self, value)
     end
 
+    # PostgreSQL has no `!&&`, so this is Arel's own Not wrapped around core's
+    # `overlaps` — which also means the operand is quoted exactly as `overlaps`
+    # quotes it.
+    def not_overlaps(value)
+      Arel::Nodes::Not.new(overlaps(value))
+    end
+
   end
 end
