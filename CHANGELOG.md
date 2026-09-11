@@ -1,4 +1,4 @@
-## Unreleased
+## [9.1.0] - 2026-09-10
 
 ### Added
 - PostgreSQL's positional range operators on attributes: `strictly_left_of`
