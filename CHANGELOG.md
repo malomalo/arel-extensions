@@ -4,8 +4,7 @@
 
 - PostgreSQL's positional range operators on attributes: `strictly_left_of`
   (`<<`), `strictly_right_of` (`>>`), `not_extend_right_of` (`&<`),
-  `not_extend_left_of` (`&>`) and `adjacent_to` (`-|-`). 
-  
+  `not_extend_left_of` (`&>`) and `adjacent_to` (`-|-`).
 
 ### Changed
 
