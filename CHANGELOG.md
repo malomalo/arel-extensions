@@ -1,32 +1,21 @@
-## Unreleased
+## [9.1.0] - 2026-09-10
 
 ### Added
+
 - PostgreSQL's positional range operators on attributes: `strictly_left_of`
   (`<<`), `strictly_right_of` (`>>`), `not_extend_right_of` (`&<`),
-  `not_extend_left_of` (`&>`) and `adjacent_to` (`-|-`). Each is an
-  `InfixOperation`, so Arel's own visitor renders it and no visitor is added
-  here. Operands are quoted through the attribute the way `overlaps` quotes
-  them, so a Ruby Range works and an already-built node passes through.
-- `not_overlaps` on attributes, the negation of Arel core’s `overlaps`. The
-  Sunstone visitor already emitted a not_overlaps key but there was no way to
-  build the node it visited, so `attribute.not_overlaps(value)` raised
-  `NoMethodError`. PostgreSQL has no `!&&` operator, so it is Arel’s own `Not`
-  wrapped around `overlaps`, which also means the operand is quoted exactly as
-  `overlaps` quotes it.
+  `not_extend_left_of` (`&>`) and `adjacent_to` (`-|-`).
 
 ### Changed
+
 - The Sunstone visitor handles `Arel::Nodes::Not` in place of the
-  `Arel::Nodes::NotOverlaps` it used to name. The serialized form is unchanged;
-  the node it unwraps is not.
+  `Arel::Nodes::NotOverlaps` it used to name, which never existed — so
+  `attribute.overlaps(x).not` now serializes where nothing could before.
 
 ### Fixed
+
 - `contained_by` now accepts a Ruby Range, so range columns work with all three
-  range predicates. It was the only one that did not quote its operand — a
-  deliberate choice for JSON and ARRAY, whose callers pre-wrap the value — which
-  meant `period.contained_by(t1...t2)` raised `TypeError: Cannot visit Range`
-  while `contains` and `overlaps` (from Arel core, which quotes through the
-  attribute) worked. Only Ruby Ranges are quoted; every other operand is passed
-  through untouched as before.
+  range predicates.
 
 ## [9.0.1] - 2026-08-30
 

@@ -114,8 +114,8 @@ module Arel
         end
       end
 
-      # `not_overlaps` builds Arel's own Not around an Overlaps rather than a
-      # bespoke node, so the negation is unwrapped here.
+      # A negated Overlaps — `attribute.overlaps(x).not` — is the only NOT this
+      # adapter knows how to serialize, so the negation is unwrapped here.
       def visit_Arel_Nodes_Not o, collector
         expr = o.expr
 
