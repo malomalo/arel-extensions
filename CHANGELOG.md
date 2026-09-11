@@ -1,12 +1,15 @@
 ## Unreleased
 
 ### Added
-- PostgreSQL's positional range operators on attributes: `strictly_left_of`
-  (`<<`), `strictly_right_of` (`>>`), `not_extend_right_of` (`&<`),
-  `not_extend_left_of` (`&>`) and `adjacent_to` (`-|-`). Each is an
-  `InfixOperation`, so Arel's own visitor renders it and no visitor is added
-  here. Operands are quoted through the attribute the way `overlaps` quotes
-  them, so a Ruby Range works and an already-built node passes through.
+- PostgreSQL’s positional range operators on attributes: `ends_before` (`<<`),
+  `ends_by` (`&<`), `starts_after` (`>>`), `starts_by` (`&>`) and `adjacent_to`
+  (`-|-`). Each compares one edge of the receiver against one edge of the
+  operand — `ends_before` is `upper(a) <= lower(b)`, `ends_by` is
+  `upper(a) <= upper(b)`, and so on — so the first pair forbid overlap while the
+  second pair permit it. Each node is an `InfixOperation`, so Arel’s own visitor
+  renders it and no visitor is added here. Operands are quoted through the
+  attribute the way `overlaps` quotes them, so a Ruby Range works and an
+  already-built node passes through.
 - `not_overlaps` on attributes, the negation of Arel core’s `overlaps`. The
   Sunstone visitor already emitted a not_overlaps key but there was no way to
   build the node it visited, so `attribute.not_overlaps(value)` raised

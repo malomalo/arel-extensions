@@ -10,23 +10,23 @@ module Arel
   module RangePredications
 
     # <<
-    def strictly_left_of(value)
-      Arel::Nodes::StrictlyLeftOf.new(self, Arel::Nodes.build_quoted(value, self))
+    def ends_before(value)
+      Arel::Nodes::EndsBefore.new(self, Arel::Nodes.build_quoted(value, self))
     end
 
     # >>
-    def strictly_right_of(value)
-      Arel::Nodes::StrictlyRightOf.new(self, Arel::Nodes.build_quoted(value, self))
+    def starts_after(value)
+      Arel::Nodes::StartsAfter.new(self, Arel::Nodes.build_quoted(value, self))
     end
 
     # &<
-    def not_extend_right_of(value)
-      Arel::Nodes::NotExtendRightOf.new(self, Arel::Nodes.build_quoted(value, self))
+    def ends_by(value)
+      Arel::Nodes::EndsBy.new(self, Arel::Nodes.build_quoted(value, self))
     end
 
     # &>
-    def not_extend_left_of(value)
-      Arel::Nodes::NotExtendLeftOf.new(self, Arel::Nodes.build_quoted(value, self))
+    def starts_by(value)
+      Arel::Nodes::StartsBy.new(self, Arel::Nodes.build_quoted(value, self))
     end
 
     # -|-

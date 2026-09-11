@@ -2,9 +2,9 @@
 
 module Arel
   module Nodes
-    # PostgreSQL `<<`. Is the left range strictly left of the right one — every element lower,
+    # PostgreSQL `<<`. Does the left range end before the right one starts — every element lower,
     # with no overlap?
-    class StrictlyLeftOf < InfixOperation
+    class EndsBefore < InfixOperation
       def initialize(left, right)
         super(:"<<", left, right)
       end

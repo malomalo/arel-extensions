@@ -81,17 +81,26 @@ Beyond containment and overlap, PostgreSQL's positional operators ask where two
 ranges sit relative to one another:
 
 ```ruby
-period.strictly_left_of(other)     # period << other
-period.strictly_right_of(other)    # period >> other
-period.not_extend_right_of(other)  # period &< other
-period.not_extend_left_of(other)   # period &> other
-period.adjacent_to(other)          # period -|- other
+period.ends_before(other)   # period << other
+period.ends_by(other)       # period &< other
+period.starts_after(other)  # period >> other
+period.starts_by(other)     # period &> other
+period.adjacent_to(other)   # period -|- other
 ```
 
-`<<` and `>>` mean every element is lower (or higher) with no overlap. `&<` asks
-whether the left range stops at or before the right one's upper bound, and `&>`
-whether it starts at or after the right one's lower bound. `-|-` is true when the
-two abut — touching, with no gap and no overlap.
+Each compares one edge of the receiver against one edge of the operand:
+
+| Method | SQL | Is exactly |
+| --- | --- | --- |
+| `ends_before` | `<<` | `upper(a) <= lower(b)` — ends before the other starts |
+| `ends_by` | `&<` | `upper(a) <= upper(b)` — ends by the time the other does |
+| `starts_after` | `>>` | `lower(a) >= upper(b)` — starts after the other ends |
+| `starts_by` | `&>` | `lower(a) >= lower(b)` — starts no earlier than the other |
+| `adjacent_to` | `-\|-` | the two abut, with no gap and no overlap |
+
+So `ends_before` and `starts_after` require no overlap at all, while `ends_by`
+and `starts_by` only constrain one edge and permit overlap. All five compare two
+ranges — PostgreSQL has no point form of any of them.
 
 ### JSON / JSONB predicates
 

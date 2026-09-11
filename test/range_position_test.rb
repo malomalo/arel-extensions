@@ -11,26 +11,26 @@ class RangePositionTest < ActiveSupport::TestCase
     Property.arel_table['period']
   end
 
-  test 'strictly_left_of renders <<' do
-    assert_sql(<<~SQL, period.strictly_left_of(LATE))
+  test 'ends_before renders <<' do
+    assert_sql(<<~SQL, period.ends_before(LATE))
       "properties"."period" << '[2026-07-01 00:00:00,2026-12-31 00:00:00)'
     SQL
   end
 
-  test 'strictly_right_of renders >>' do
-    assert_sql(<<~SQL, period.strictly_right_of(EARLY))
+  test 'starts_after renders >>' do
+    assert_sql(<<~SQL, period.starts_after(EARLY))
       "properties"."period" >> '[2026-01-01 00:00:00,2026-06-30 00:00:00)'
     SQL
   end
 
-  test 'not_extend_right_of renders &<' do
-    assert_sql(<<~SQL, period.not_extend_right_of(LATE))
+  test 'ends_by renders &<' do
+    assert_sql(<<~SQL, period.ends_by(LATE))
       "properties"."period" &< '[2026-07-01 00:00:00,2026-12-31 00:00:00)'
     SQL
   end
 
-  test 'not_extend_left_of renders &>' do
-    assert_sql(<<~SQL, period.not_extend_left_of(EARLY))
+  test 'starts_by renders &>' do
+    assert_sql(<<~SQL, period.starts_by(EARLY))
       "properties"."period" &> '[2026-01-01 00:00:00,2026-06-30 00:00:00)'
     SQL
   end
@@ -42,7 +42,7 @@ class RangePositionTest < ActiveSupport::TestCase
   end
 
   test 'every operator executes against PostgreSQL' do
-    %i[strictly_left_of strictly_right_of not_extend_right_of not_extend_left_of adjacent_to].each do |op|
+    %i[ends_before starts_after ends_by starts_by adjacent_to].each do |op|
       Property.where(period.public_send(op, LATE)).first
     end
   end
